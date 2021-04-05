@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="jsonapi" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/jsonapi/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/jsonapi/lib" />
+    </SOURCES>
+  </library>
+</component>
