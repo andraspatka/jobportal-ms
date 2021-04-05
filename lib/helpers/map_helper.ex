@@ -1,6 +1,6 @@
 defmodule Api.Helpers.MapHelper do
   @doc "
-  Takes String keys in a Map and convers them to Atoms.
+  Takes String keys in a Map and converts them to Atoms.
   "
   def string_keys_to_atoms(document) when is_map(document) do
     Enum.reduce(document, %{}, fn {key, val}, acc ->

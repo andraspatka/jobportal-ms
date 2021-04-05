@@ -1,7 +1,7 @@
 defmodule Api.Encrypt do
   @moduledoc false
 
-  def encrypt(password) do
+  def hash(password) do
     Pbkdf2.hash_pwd_salt(password)
   end
 

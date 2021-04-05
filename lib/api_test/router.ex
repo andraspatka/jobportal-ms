@@ -10,7 +10,6 @@ defmodule Api.Router do
   )
   plug(:dispatch)
 
-  forward("/bands", to: Api.Endpoint)
   forward("/users", to: Api.UserEndpoint)
 
   match _ do

@@ -3,9 +3,8 @@ use Mix.Config
 config :api_test,
   db_host: "localhost",
   db_port: 27017,
-  db_db: "bands",
+  db_db: "jobportal",
   db_tables: [
-    "band",
     "user"
   ],
 

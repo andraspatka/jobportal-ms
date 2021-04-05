@@ -15,9 +15,6 @@ defmodule Api.UserEndpoint do
   plug JsonTestPlug
   plug :encode_response
 
-
-
-
   defp encode_response(conn, _) do
     conn
     |>send_resp(conn.status, conn.assigns |> Map.get(:jsonapi, %{}) |> Poison.encode!)
@@ -95,7 +92,7 @@ defmodule Api.UserEndpoint do
 
 
   post "/register", private: %{view: UserView} do
-    password_hash = Encrypt.encrypt(Map.get(conn.params, "password", nil))
+    password_hash = Encrypt.hash(Map.get(conn.params, "password", nil))
     {username, email, id, password} = {
       Map.get(conn.params, "username", nil),
       Map.get(conn.params, "email", nil),

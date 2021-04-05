@@ -25,3 +25,6 @@ api_test-*.tar
 
 # Temporary files for e.g. tests
 /tmp
+
+*.iml
+.idea
