@@ -1,8 +1,25 @@
-# ApiTest
+# JobPortal Monorepo
 
-**TODO: Add description**
+## Architecture
 
-## Installation
+![Architecture](docs/architecture.png)
+
+Components:
+- JobPortalUI: Angular web application, user interface
+- JobPortalService: An aggregator microservice. Handles the communication with all other microservices. 
+Its goal is to hide the complexity of the microservice architecture from the UI
+- UserManagementService: Handles User registration, sign in, approvals.
+- PostingsService: Handles operations relating to Postings (CRUD, apply).
+- EventLoggingService: Gets events from UserMangementService and PostingsService via a RabbitMQ Queue.
+Saves the Events to a MongoDB Database. 
+- StatisticsService: Can query each type of Event. Handles business logic for aggregating the events and extracting
+statistics from them.
+
+UserManagementService and PostingService uses the same Database, but they use different schemas.
+
+## Elixir
+
+### Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 by adding `api_test` to your list of dependencies in `mix.exs`:
@@ -19,20 +36,7 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/api_test](https://hexdocs.pm/api_test).
 
-## TODO
-
-- Step 1. install mongo
-- Step 2. create db (use bands)
-- Step 3. run and test band api
-- Step 4. implment User Management Api
-
-- Api pentru User Management:
-- /users/register POST
-- /users/login POST => %{"message": :ok}
-- /users PATCH (UPDATE username)
-- User(id, username, email, password)
-
-## Running the project
+### Running the project
 
 Compile deps: mix do deps.get, deps.compile, compile
 Run project: mix run --no-halt
