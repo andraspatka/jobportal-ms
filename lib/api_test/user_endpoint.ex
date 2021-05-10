@@ -4,7 +4,6 @@ defmodule Api.UserEndpoint do
   alias Api.Views.UserView
   alias Api.Models.User
   alias Api.Plugs.JsonTestPlug
-  alias Api.Encrypt
 
   @api_port Application.get_env(:api_test, :api_port)
   @api_host Application.get_env(:api_test, :api_host)
@@ -71,28 +70,60 @@ defmodule Api.UserEndpoint do
         case User.find(%{email: email}) do
           {:ok, user} ->
             password_hash = user.password
+            {:ok, service} = Api.Service.Auth.start_link
             cond do
-              !Encrypt.check(password, password_hash) ->
+              !Api.Service.Auth.verify_hash(service, {password, password_hash}) ->
                 conn
                 |> put_status(403)
                 |> assign(:jsonapi, %{error: "password invalid!"})
 
             true ->
+              {:ok, service} = Api.Service.Auth.start_link
+              token = Api.Service.Auth.issue_token(service, %{:email => email})
+
               conn
               |> put_status(200)
-              |> assign(:jsonapi, user)
+              |> assign(:jsonapi, %{:token => token})
             :error ->
               conn
               |> put_status(500)
               |> assign(:jsonapi, %{"error" => "An unexpected error happened"})
             end
+          :error ->
+            conn
+            |> put_status(404)
+            |> assign(:jsonapi, %{"error" => "User not found"})
         end
+    end
+  end
+
+  post "/logout" do
+    IO.puts("Called logout")
+    {email, password} = {
+      Map.get(conn.params, "email", nil),
+      Map.get(conn.params, "password", nil),
+    }
+
+    {:ok, service} = Api.Service.Auth.start_link
+
+    case Api.Service.Auth.revoke_token(service, %{:email => email}) do
+      :ok ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, %{"message" => "logged out: #{email}, token deleted"})
+      :error ->
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{"message" => "Could not log out. problem! Please log in."})
+
     end
   end
 
 
   post "/register", private: %{view: UserView} do
-    password_hash = Encrypt.hash(Map.get(conn.params, "password", nil))
+    IO.puts("Registration request...")
+    {:ok, service} = Api.Service.Auth.start_link
+    password_hash = Api.Service.Auth.generate_hash(service, Map.get(conn.params, "password", nil))
     {username, email, id, password} = {
       Map.get(conn.params, "username", nil),
       Map.get(conn.params, "email", nil),
@@ -100,23 +131,28 @@ defmodule Api.UserEndpoint do
       password_hash
     }
 
+    IO.puts("Registration request: #{username}, #{email}, #{id}, #{password}")
     cond do
       is_nil(username) ->
+        IO.puts("Username missing")
         conn
         |> put_status(400)
         |> assign(:jsonapi, %{error: "username must be present!"})
 
       is_nil(email) ->
+        IO.puts("Email missing")
         conn
         |> put_status(400)
         |> assign(:jsonapi, %{error: "email must be present!"})
 
       is_nil(password) ->
+        IO.puts("password missing")
         conn
         |> put_status(400)
         |> assign(:jsonapi, %{error: "password must be present!"})
 
       is_nil(id) ->
+        IO.puts("id missing")
         conn
         |> put_status(400)
         |> assign(:jsonapi, %{error: "id must be present!"})

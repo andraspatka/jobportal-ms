@@ -30,6 +30,7 @@ defmodule ApiTest.MixProject do
       {:jsonapi, "~> 0.7.0"},
       {:mongodb, "~> 0.5.1"},
       {:timex, "~> 3.7.3"},
+      {:joken, "~> 2.0"},
       {:pbkdf2_elixir, "~> 1.3.0"},
     ]
   end

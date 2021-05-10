@@ -10,4 +10,7 @@ config :api_test,
 
 api_host: "localhost",
 api_port: 4000,
-api_scheme: "http"
+api_scheme: "http",
+app_secret_key: "secret",
+jwt_validity: 3600
+

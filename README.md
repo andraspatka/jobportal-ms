@@ -41,3 +41,9 @@ be found at [https://hexdocs.pm/api_test](https://hexdocs.pm/api_test).
 Compile deps: mix do deps.get, deps.compile, compile
 Run project: mix run --no-halt
 
+
+## MongoDB
+
+```
+docker run -p 27017:27017 -d --name mongodb mongo
+```
