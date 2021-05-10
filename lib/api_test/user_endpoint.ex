@@ -9,9 +9,12 @@ defmodule Api.UserEndpoint do
   @api_host Application.get_env(:api_test, :api_host)
   @api_scheme Application.get_env(:api_test, :api_scheme)
 
+  @skip_token_verification %{jwt_skip: true}
+
   plug :match
   plug :dispatch
   plug JsonTestPlug
+  plug Api.AuthPlug
   plug :encode_response
 
   defp encode_response(conn, _) do
@@ -19,7 +22,8 @@ defmodule Api.UserEndpoint do
     |>send_resp(conn.status, conn.assigns |> Map.get(:jsonapi, %{}) |> Poison.encode!)
   end
 
-  get "/", private: %{view: UserView}  do
+  # Todo, fix this, fix auth
+  get "/", private: @skip_token_verification, private: %{view: UserView}  do
     params = Map.get(conn.params, "filter", %{})
 
     {_, users} =  User.find(params)
@@ -46,7 +50,7 @@ defmodule Api.UserEndpoint do
     end
   end
 
-  post "/login", private: %{view: UserView} do
+  post "/login" do
     {email, password} = {
       Map.get(conn.params, "email", nil),
       Map.get(conn.params, "password", nil),
