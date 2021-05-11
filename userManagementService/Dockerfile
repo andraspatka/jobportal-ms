@@ -2,7 +2,7 @@ FROM elixir:1.11.4-alpine
 
 WORKDIR src
 
-ADD . .
+ADD .. .
 
 RUN mix local.hex --force
 
