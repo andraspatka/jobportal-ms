@@ -23,7 +23,7 @@ defmodule Api.UserEndpoint do
   end
 
   # Todo, fix this, fix auth
-  get "/", private: @skip_token_verification, private: %{view: UserView}  do
+  get "/", private: %{view: UserView}  do
     params = Map.get(conn.params, "filter", %{})
 
     {_, users} =  User.find(params)
@@ -50,7 +50,7 @@ defmodule Api.UserEndpoint do
     end
   end
 
-  post "/login" do
+  post "/login", private: @skip_token_verification do
     {email, password} = {
       Map.get(conn.params, "email", nil),
       Map.get(conn.params, "password", nil),
@@ -101,7 +101,7 @@ defmodule Api.UserEndpoint do
     end
   end
 
-  post "/logout" do
+  post "/logout", private: @skip_token_verification do
     IO.puts("Called logout")
     {email, password} = {
       Map.get(conn.params, "email", nil),
@@ -124,7 +124,7 @@ defmodule Api.UserEndpoint do
   end
 
 
-  post "/register", private: %{view: UserView} do
+  post "/register", private: @skip_token_verification, private: %{view: UserView} do
     IO.puts("Registration request...")
     {:ok, service} = Api.Service.Auth.start_link
     password_hash = Api.Service.Auth.generate_hash(service, Map.get(conn.params, "password", nil))
