@@ -17,29 +17,24 @@ statistics from them.
 
 UserManagementService and PostingService uses the same Database, but they use different schemas.
 
+## Datamodel
+
+![Datamodel](docs/datamodel.png)
+
 ## Elixir
-
-### Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `api_test` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:api_test, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/api_test](https://hexdocs.pm/api_test).
 
 ### Running the project
 
-Compile deps: mix do deps.get, deps.compile, compile
-Run project: mix run --no-halt
+Compile deps: 
+
+```
+  mix do deps.get, deps.compile, compile
+```
+
+Run project: 
+```
+mix run --no-halt
+```
 
 
 ## MongoDB
@@ -54,6 +49,7 @@ docker run -p 27017:27017 -d --name mongodb mongo
 curl -v -X POST localhost:4000/users/login?username="user"&email="email"&password="password"&id=2
 
 curl -X POST -H "Content-Type: application/json" -d '{"email":"email@gmail.com", "password":"password"}' localhost:4000/users/login
+curl -X POST -H "Content-Type: application/json" -d '{"email":"email@gmail.com", "password":"password"}' localhost:4000/users/logout
 
 curl -X POST -H "Content-Type: application/json" -d '{"email":"email@gmail.com", "password":"password", "id":"1", "username":"user"}' localhost:4000/users/register
 
