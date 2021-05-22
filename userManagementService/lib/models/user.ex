@@ -8,9 +8,12 @@ defmodule Api.Models.User do
   #INFO: mongo also has an internal ID
   defstruct [
     :id,
-    :username,
     :email,
     :password,
+    :first_name,
+    :last_name,
+    :role,
+    :company,
     :created_at,
     :updated_at,
   ]

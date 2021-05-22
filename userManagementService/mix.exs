@@ -32,6 +32,7 @@ defmodule UserManagement.MixProject do
       {:timex, "~> 3.7.3"},
       {:joken, "~> 2.0"},
       {:pbkdf2_elixir, "~> 1.3.0"},
+      {:elixir_uuid, "~> 1.2.1"},
     ]
   end
 end
