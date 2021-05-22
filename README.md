@@ -55,3 +55,10 @@ curl -X POST -H "Content-Type: application/json" -d '{"email":"email@gmail.com",
 
 curl -X GET -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWlsQGdtYWlsLmNvbSIsImV4cCI6MTYyMDY4NDgzOCwiaWF0IjoxNjIwNjgxMjM4LCJhdWQiOiJKb2tlbiIsImV4cCI6MTYyMDY4ODQzOCwiaWF0IjoxNjIwNjgxMjM4LCJpc3MiOiJKb2tlbiIsImp0aSI6IjJwdXQxdnZoZG5yNDE4bmM4czAwMDBmMSIsIm5iZiI6MTYyMDY4MTIzOH0.Pu49NXsselRnUQaCeHOgHnaFi1G7p28n2DwacTgvEuM' localhost:4000/users
 ```
+
+# Some test data
+
+```bash
+db.user.insert({"company" : "NTT Data", "created_at" : 1621715109, "email" : "joe@ntt.data.com", "first_name" : "John", "id" : "af711ff0-bb26-11eb-902a-708bcd51d01d", "last_name" : "Doe", "password" : "$pbkdf2-sha512$160000$5WM8kM3OFdzbe7I5G1nItQ$pnAlSCEwIz2UdfBdfWQFHf3r3biPVeiqYDZRFi1qKPz23pt2rzouAHsNTYT5NTyL7Um9URIFVBpcdUiTLECYNw", "role" : "1", "updated_at" : 1621715109 })
+db.company.insert({name: "NTT Data", admin: "af711ff0-bb26-11eb-902a-708bcd51d01d"})
+```

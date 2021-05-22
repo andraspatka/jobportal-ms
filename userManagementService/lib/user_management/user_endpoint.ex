@@ -3,6 +3,8 @@ defmodule Api.UserEndpoint do
 
   alias Api.Views.UserView
   alias Api.Models.User
+  alias Api.Models.CompanyEmployee
+  alias Api.Models.Company
   alias Api.Plugs.JsonTestPlug
 
   @api_port Application.get_env(:user_management, :api_port)
@@ -201,10 +203,16 @@ defmodule Api.UserEndpoint do
         |> put_status(409)
         |> assign(:jsonapi, %{error: "email already exists in the db!"})
 
+      Company.find(%{name: company}) == :error ->
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{error: "Company not found!"})
+
 
       true ->
         case %User{id: id, email: email, password: password, first_name: first_name, last_name: last_name, role: role, company: company} |> User.save do
           {:ok, createdEntry} ->
+            {:ok, company_employee} = %CompanyEmployee{company_name: company, user_id: id} |> CompanyEmployee.save
             uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
             #not optimal
 
