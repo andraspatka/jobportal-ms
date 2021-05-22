@@ -1,6 +1,5 @@
 defmodule Models.Postings do
-    defstruct 
-        id: nil,
+    defstruct id: nil,
         postedById: nil,
         postedAt: nil,
         deadline: nil,

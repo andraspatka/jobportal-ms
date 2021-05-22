@@ -67,7 +67,7 @@ defmodule Endpoints.AuthEndpoint do
     body = ""
     headers = [{"Content-type", "application/json"}]
 
-    case HTTPoison.get(companiesUrl, body, headers, []) do
+    case HTTPoison.get(companiesUrl) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         conn
         |> put_status(200)

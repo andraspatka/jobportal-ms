@@ -4,5 +4,5 @@ defmodule Models.Application do
     education: nil,
     applicationDate: nil,
     applicantId: nil,
-    postingId: nil,
+    postingId: nil
 end
