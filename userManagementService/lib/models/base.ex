@@ -47,7 +47,7 @@ defmodule Api.Models.Base do
       end
 
 
-      def find(filters) when is_map(filters) do
+      def find_all(filters) when is_map(filters) do
         cursor = Mongo.find(:mongo, @db_table, filters)
 
         case cursor |> Enum.to_list do

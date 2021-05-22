@@ -31,7 +31,7 @@ defmodule Api.UserEndpoint do
   get "/", private: %{view: UserView}  do
     params = Map.get(conn.params, "filter", %{})
 
-    {_, users} =  User.find(params)
+    {_, users} =  User.find_all(params)
 
     conn
     |> put_status(200)
