@@ -10,6 +10,8 @@ defmodule Api.Models.Category do
   defstruct [
     :id,
     :name,
+    :created_at,
+    :updated_at
   ]
 
 end

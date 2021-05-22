@@ -32,35 +32,29 @@ defmodule Api.PostingEndpoint do
       }  do
     params = Map.get(conn.params, "filter", %{})
 
-    case Posting.find(params) do
+    case Posting.findAll(params) do
       {:ok, postings} ->
         conn
         |> put_status(200)
         |> assign(:jsonapi, postings)
       :error ->
         conn
-        |> put_status(404)
-        |> assign(:jsonapi, %{"error" => "No postings found."})
+        |> put_status(200)
+        |> assign(:jsonapi, %{"error" => "No postings were found."})
     end
   end
 
-  delete "/:id",
-         private: %{
-           view: PostingView
-         }  do
-    {parsedId, ""} = Integer.parse(id)
-
-    case Posting.delete(parsedId) do
+  delete "/:id" do
+    case Posting.delete(id) do
       {:ok, posting} ->
-
         conn
         |> put_status(200)
-        |> assign(:jsonapi, posting)
+        |> assign(:jsonapi, %{body: "Posting was successfully deleted."})
 
       :error ->
         conn
         |> put_status(404)
-        |> assign(:jsonapi, %{"error" => "'posting' with the given id was not found."})
+        |> assign(:jsonapi, %{body: "Posting with the given id was not found."})
     end
   end
 
@@ -148,7 +142,6 @@ defmodule Api.PostingEndpoint do
 
   end
 
-  # TODO: posting ID
   post "/",
        private: @skip_token_verification,
        private: %{
@@ -243,7 +236,7 @@ defmodule Api.PostingEndpoint do
           :error ->
             conn
             |> put_status(500)
-            |> assign(:jsonapi, %{"error" => "An unexpected error happened"})
+            |> assign(:jsonapi, %{body: "An unexpected error happened"})
         end
     end
   end
