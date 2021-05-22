@@ -22,6 +22,11 @@ defmodule Api.UserEndpoint do
     |>send_resp(conn.status, conn.assigns |> Map.get(:jsonapi, %{}) |> Poison.encode!)
   end
 
+  defp is_password_correct(password_hash, password) do
+    {:ok, service} = Api.Service.Auth.start_link
+    Api.Service.Auth.verify_hash(service, {password, password_hash})
+  end
+
   # Todo, fix this, fix auth
   get "/", private: %{view: UserView}  do
     params = Map.get(conn.params, "filter", %{})
@@ -73,10 +78,8 @@ defmodule Api.UserEndpoint do
 
         case User.find(%{email: email}) do
           {:ok, user} ->
-            password_hash = user.password
-            {:ok, service} = Api.Service.Auth.start_link
             cond do
-              !Api.Service.Auth.verify_hash(service, {password, password_hash}) ->
+              !is_password_correct(user.password, password) ->
                 conn
                 |> put_status(403)
                 |> assign(:jsonapi, %{error: "password invalid!"})
@@ -110,17 +113,38 @@ defmodule Api.UserEndpoint do
 
     {:ok, service} = Api.Service.Auth.start_link
 
-    case Api.Service.Auth.revoke_token(service, %{:email => email}) do
-      :ok ->
-        conn
-        |> put_status(200)
-        |> assign(:jsonapi, %{"message" => "logged out: #{email}, token deleted"})
+    case User.find(%{email: email}) do
+      {:ok, user} ->
+        cond do
+          !is_password_correct(user.password, password) ->
+            conn
+            |> put_status(403)
+            |> assign(:jsonapi, %{error: "password invalid!"})
+
+          true ->
+            case Api.Service.Auth.revoke_token(service, %{:email => email}) do
+              :ok ->
+                conn
+                |> put_status(200)
+                |> assign(:jsonapi, %{"message" => "logged out: #{email}, token deleted"})
+              :error ->
+                conn
+                |> put_status(400)
+                |> assign(:jsonapi, %{"message" => "Could not log out. problem! Please log in."})
+
+            end
+          :error ->
+            conn
+            |> put_status(500)
+            |> assign(:jsonapi, %{"error" => "An unexpected error happened"})
+        end
       :error ->
         conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{"message" => "Could not log out. problem! Please log in."})
-
+        |> put_status(404)
+        |> assign(:jsonapi, %{"error" => "User not found"})
     end
+
+
   end
 
 
