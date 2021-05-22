@@ -27,7 +27,6 @@ defmodule Api.UserEndpoint do
     Api.Service.Auth.verify_hash(service, {password, password_hash})
   end
 
-  # Todo, fix this, fix auth
   get "/", private: %{view: UserView}  do
     params = Map.get(conn.params, "filter", %{})
 
@@ -39,9 +38,7 @@ defmodule Api.UserEndpoint do
   end
 
   get "/:id", private: %{view: UserView}  do
-    {parsedId, ""} = Integer.parse(id)
-
-    case User.get(parsedId) do
+    case User.get(id) do
       {:ok, user} ->
 
         conn
