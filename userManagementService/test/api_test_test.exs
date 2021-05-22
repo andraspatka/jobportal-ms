@@ -1,8 +1,8 @@
-defmodule ApiTestTest do
+defmodule UserManagementTest do
   use ExUnit.Case
-  doctest ApiTest
+  doctest UserManagement
 
   test "greets the world" do
-    assert ApiTest.hello() == :world
+    assert UserManagement.hello() == :world
   end
 end
