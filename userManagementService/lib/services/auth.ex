@@ -2,8 +2,8 @@ defmodule Api.Service.Auth do
   use GenServer
   use Timex
 
-  @app_secret_key Application.get_env(:api_test, :app_secret_key)
-  @jwt_validity Application.get_env(:api_test, :jwt_validity)
+  @app_secret_key Application.get_env(:user_management, :app_secret_key)
+  @jwt_validity Application.get_env(:user_management, :jwt_validity)
   @issuer :api
 
   def start_link do
