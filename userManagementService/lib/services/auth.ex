@@ -37,7 +37,7 @@ defmodule Api.Service.Auth do
       iat: Timex.to_unix(Timex.now),
       exp: Timex.to_unix(Timex.shift(Timex.now, seconds: @jwt_validity))
     })
-                    |> Api.Token.generate_and_sign (signer)
+    |> Api.Token.generate_and_sign(signer)
 
     :ets.insert(:users, {claims.email, jwt})
 

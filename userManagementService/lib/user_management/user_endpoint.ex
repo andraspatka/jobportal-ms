@@ -83,7 +83,8 @@ defmodule Api.UserEndpoint do
 
             true ->
               {:ok, service} = Api.Service.Auth.start_link
-              token = Api.Service.Auth.issue_token(service, %{:email => email})
+              token = Api.Service.Auth.issue_token(service,
+                %{:email => email, :role => user.role, :firstname => user.first_name, :lastname => user.last_name})
 
               conn
               |> put_status(200)
@@ -140,8 +141,6 @@ defmodule Api.UserEndpoint do
         |> put_status(404)
         |> assign(:jsonapi, %{"error" => "User not found"})
     end
-
-
   end
 
 
