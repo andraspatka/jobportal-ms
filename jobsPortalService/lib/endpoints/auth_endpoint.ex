@@ -20,8 +20,8 @@ defmodule Endpoints.AuthEndpoint do
     body = Poison.encode!(%Login{email: email, password: password})
     headers = [{"Content-type", "application/json"}]
     
-    case HTTPoison.post(loginUrl, body, headers, []) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+    case HTTPoison.post(loginUrl, body, headers) do
+      {:ok, %HTTPoison.Response{body: body}} ->
         conn
         |> put_status(200)
         |> assign(:jsonapi, body)
@@ -46,7 +46,7 @@ defmodule Endpoints.AuthEndpoint do
     headers = [{"Content-type", "application/json"}]
 
     case HTTPoison.post(registerUrl, body, headers, []) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+      {:ok, %HTTPoison.Response{body: body}} ->
         conn
         |> put_status(200)
         |> assign(:jsonapi, body)
