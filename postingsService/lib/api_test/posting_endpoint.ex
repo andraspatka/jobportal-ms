@@ -62,9 +62,7 @@ defmodule Api.PostingEndpoint do
       private: %{
         view: PostingView
       }  do
-    {parsedId, ""} = Integer.parse(id)
-
-    case Posting.get(parsedId) do
+    case Posting.get(id) do
       {:ok, posting} ->
 
         conn
@@ -74,7 +72,7 @@ defmodule Api.PostingEndpoint do
       :error ->
         conn
         |> put_status(404)
-        |> assign(:jsonapi, %{"error" => "'posting' not found"})
+        |> assign(:jsonapi, %{body: "Posting with the given id was not found."})
     end
   end
 
@@ -83,7 +81,7 @@ defmodule Api.PostingEndpoint do
         private: %{
           view: PostingView
         }  do
-    IO.puts("Editing a post...")
+    IO.puts("Editing a post.")
 
     {id, deadline, name, description, requirements} = {
       Map.get(conn.params, "id", nil),
@@ -93,11 +91,7 @@ defmodule Api.PostingEndpoint do
       Map.get(conn.params, "requirements", nil)
     }
 
-    IO.puts(
-      "Editing posting: #{id}, #{deadline}, #{name}, #{description}, #{
-        requirements
-      }"
-    )
+    IO.puts("Editing posting: #{id}, #{deadline}, #{name}, #{description}, #{requirements}")
 
     cond do
       is_nil(id) ->
@@ -107,10 +101,11 @@ defmodule Api.PostingEndpoint do
       true ->
         case Posting.find(%{id: id}) do
           {:ok, posting} ->
+            Posting.delete(id)
             case %Posting{
                    id: posting.id,
                    posted_by: posting.posted_by,
-                   created_at: posting.posted_ad,
+                   created_at: posting.created_at,
                    deadline: deadline,
                    number_of_views: posting.number_of_views,
                    name: name,
@@ -119,27 +114,22 @@ defmodule Api.PostingEndpoint do
                    requirements: requirements,
                    updated_at: nil
                  }
-                 #                 TODO is update correct?
                  |> Posting.save do
               {:ok, updatedEntity} ->
-                uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
-
                 conn
-                |> put_resp_header("location", "#{uri}#{id}")
                 |> put_status(201)
-                |> assign(:jsonapi, updatedEntity)
+                |> assign(:jsonapi, %{body: "Posting was successfully updated!"})
               :error ->
                 conn
                 |> put_status(500)
-                |> assign(:jsonapi, %{"error" => "An unexpected error happened"})
+                |> assign(:jsonapi, %{body: "Posting could not be updated."})
             end
           :error ->
             conn
             |> put_status(404)
-            |> assign(:jsonapi, %{"error" => "Posting not found"})
+            |> assign(:jsonapi, %{body: "Posting with the given Id was not found."})
         end
     end
-
   end
 
   post "/",
