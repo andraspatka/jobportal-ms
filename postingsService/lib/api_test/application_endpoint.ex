@@ -14,7 +14,6 @@ defmodule Api.ApplicationEndpoint do
   plug :match
   plug :dispatch
   plug JsonTestPlug
-  plug Api.AuthPlug
   plug :encode_response
 
   defp encode_response(conn, _) do
@@ -27,7 +26,6 @@ defmodule Api.ApplicationEndpoint do
        )
   end
 
-  # Todo, fix this, fix auth
   delete "/:id",
          private: %{
            view: ApplicationView

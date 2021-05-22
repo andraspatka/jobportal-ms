@@ -10,13 +10,14 @@ defmodule Api.Models.Posting do
   defstruct [
     :id,
     :posted_by,
-    :posted_at,
+    :created_at,
     :deadline,
     :number_of_views,
     :name,
     :description,
     :category_id,
-    :requirements
+    :requirements,
+    :updated_at
   ]
 
 

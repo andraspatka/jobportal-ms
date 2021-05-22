@@ -14,7 +14,6 @@ defmodule Api.PostingEndpoint do
   plug :match
   plug :dispatch
   plug JsonTestPlug
-  plug Api.AuthPlug
   plug :encode_response
 
   defp encode_response(conn, _) do
@@ -27,21 +26,24 @@ defmodule Api.PostingEndpoint do
        )
   end
 
-  # Todo, fix this, fix auth
   get "/",
       private: %{
         view: PostingView
       }  do
     params = Map.get(conn.params, "filter", %{})
 
-    {_, postings} = Posting.find(params)
-
-    conn
-    |> put_status(200)
-    |> assign(:jsonapi, postings)
+    case Posting.find(params) do
+      {:ok, postings} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, postings)
+      :error ->
+        conn
+        |> put_status(404)
+        |> assign(:jsonapi, %{"error" => "No postings found."})
+    end
   end
 
-  # Todo, fix this, fix auth
   delete "/:id",
          private: %{
            view: PostingView
@@ -58,7 +60,7 @@ defmodule Api.PostingEndpoint do
       :error ->
         conn
         |> put_status(404)
-        |> assign(:jsonapi, %{"error" => "'posting' not found"})
+        |> assign(:jsonapi, %{"error" => "'posting' with the given id was not found."})
     end
   end
 
@@ -114,13 +116,14 @@ defmodule Api.PostingEndpoint do
             case %Posting{
                    id: posting.id,
                    posted_by: posting.posted_by,
-                   posted_at: posting.posted_ad,
+                   created_at: posting.posted_ad,
                    deadline: deadline,
                    number_of_views: posting.number_of_views,
                    name: name,
                    description: description,
                    category_id: posting.category_id,
-                   requirements: requirements
+                   requirements: requirements,
+                   updated_at: nil
                  }
                  #                 TODO is update correct?
                  |> Posting.save do
@@ -153,7 +156,7 @@ defmodule Api.PostingEndpoint do
        } do
     IO.puts("Adding a new posting...")
 
-    {postedById, postedAt, deadline, numberOfViews, name, description, categoryId, requirements, id} = {
+    {id, postedById, postedAt, deadline, numberOfViews, name, description, categoryId, requirements} = {
       Map.get(conn.params, "id", nil),
       Map.get(conn.params, "postedById", nil),
       Map.get(conn.params, "postedAt", nil),
@@ -220,13 +223,14 @@ defmodule Api.PostingEndpoint do
         case %Posting{
                id: id,
                posted_by: postedById,
-               posted_at: postedAt,
+               created_at: postedAt,
                deadline: deadline,
                number_of_views: numberOfViews,
                name: name,
                description: description,
                category_id: categoryId,
-               requirements: requirements
+               requirements: requirements,
+               updated_at: nil
              }
              |> Posting.save do
           {:ok, createdEntry} ->
