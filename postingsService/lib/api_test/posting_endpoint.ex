@@ -37,10 +37,10 @@ defmodule Api.PostingEndpoint do
         conn
         |> put_status(200)
         |> assign(:jsonapi, postings)
-      :error ->
+      {:error, []} ->
         conn
         |> put_status(200)
-        |> assign(:jsonapi, %{"error" => "No postings were found."})
+        |> assign(:jsonapi, [])
     end
   end
 
@@ -115,10 +115,10 @@ defmodule Api.PostingEndpoint do
                    updated_at: nil
                  }
                  |> Posting.save do
-              {:ok, updatedEntity} ->
+              {:ok, updated_entity} ->
                 conn
                 |> put_status(201)
-                |> assign(:jsonapi, %{body: "Posting was successfully updated!"})
+                |> assign(:jsonapi, updated_entity)
               :error ->
                 conn
                 |> put_status(500)
@@ -139,8 +139,7 @@ defmodule Api.PostingEndpoint do
        } do
     IO.puts("Adding a new posting...")
 
-    {id, postedById, postedAt, deadline, numberOfViews, name, description, categoryId, requirements} = {
-      Map.get(conn.params, "id", nil),
+    {postedById, postedAt, deadline, numberOfViews, name, description, categoryId, requirements} = {
       Map.get(conn.params, "postedById", nil),
       Map.get(conn.params, "postedAt", nil),
       Map.get(conn.params, "deadline", nil),
@@ -152,16 +151,12 @@ defmodule Api.PostingEndpoint do
     }
 
     IO.puts(
-      "New posting request: #{id}, #{postedById}, #{postedAt}, #{deadline}, #{numberOfViews}, #{
+      "New posting request: #{postedById}, #{postedAt}, #{deadline}, #{numberOfViews}, #{
         name
       }, #{description}, #{categoryId},  #{requirements}"
     )
 
     cond do
-      is_nil(id) ->
-        conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{error: "Id must be present!"})
       is_nil(postedById) ->
         conn
         |> put_status(400)
@@ -203,6 +198,7 @@ defmodule Api.PostingEndpoint do
         |> assign(:jsonapi, %{error: "Requirements must be present!"})
 
       true ->
+        id = UUID.uuid1()
         case %Posting{
                id: id,
                posted_by: postedById,
@@ -216,13 +212,10 @@ defmodule Api.PostingEndpoint do
                updated_at: nil
              }
              |> Posting.save do
-          {:ok, createdEntry} ->
-            uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
-
+          {:ok, created_entity} ->
             conn
-            |> put_resp_header("location", "#{uri}#{id}")
             |> put_status(201)
-            |> assign(:jsonapi, createdEntry)
+            |> assign(:jsonapi, created_entity)
           :error ->
             conn
             |> put_status(500)

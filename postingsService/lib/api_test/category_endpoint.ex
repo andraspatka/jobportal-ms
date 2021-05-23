@@ -31,12 +31,16 @@ defmodule Api.CategoryEndpoint do
         view: CategoryView
       }  do
     params = Map.get(conn.params, "filter", %{})
-
-    {_, categories} = Category.findAll(params)
-
-    conn
-    |> put_status(200)
-    |> assign(:jsonapi, categories)
+    case Category.findAll(params) do
+      {:ok, categories} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, categories)
+      {:error, []} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, [])
+    end
   end
 
   post "/",
@@ -63,10 +67,10 @@ defmodule Api.CategoryEndpoint do
                updated_at: nil,
              }
              |> Category.save do
-          {:ok, createdEntry} ->
+          {:ok, created_entry} ->
             conn
             |> put_status(201)
-            |> assign(:jsonapi, %{body: "Category successfully added!"})
+            |> assign(:jsonapi, created_entry)
           :error ->
             conn
             |> put_status(500)
