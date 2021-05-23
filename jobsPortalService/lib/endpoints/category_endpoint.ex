@@ -2,14 +2,11 @@ defmodule Endpoints.CategoryEndpoint do
 
     import Plug.Conn
     use Plug.Router
-    alias Routes.Base, as: Base
-    alias Models.Postings
     alias Models.Category
-    alias Models.Application
 
     plug(:match)
     plug(:dispatch)
-    
+
     get "/categories" do
         getCategoriesUrl = "http://localhost:3000/categories"
 
