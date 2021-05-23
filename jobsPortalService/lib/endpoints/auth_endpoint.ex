@@ -72,18 +72,18 @@ defmodule Endpoints.AuthEndpoint do
     headers = [{"Content-type", "application/json"}]
 
     case HTTPoison.get(companiesUrl) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+      {:ok, response} ->
         conn
-        |> put_status(200)
-        |> assign(:jsonapi, body)
-      {:not_found, %HTTPoison.Response{status_code: 404}} ->
+          |> put_resp_content_type("application/json")
+          |> send_resp(200, response.body)
+      {:not_found, response} ->
         conn
-        |> put_status(404)
-        |> assign(:jsonapi, %{"not found" => "not found"})
-      {:error, %HTTPoison.Error{reason: reason}} ->
+          |> put_resp_content_type("application/json")
+          |> send_resp(404, response.body)
+      {:error, response} ->
         conn
-        |> put_status(500)
-        |> assign(:jsonapi, %{"error" => "internal erro"})
+          |> put_resp_content_type("application/json")
+          |> send_resp(500, response.body)
     end
   end
 end
