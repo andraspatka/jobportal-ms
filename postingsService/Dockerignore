@@ -1,0 +1,9 @@
+deps
+test
+.idea
+_build
+docs
+README.md
+*.iml
+.git
+.gitignore
