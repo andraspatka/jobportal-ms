@@ -1,9 +1,9 @@
-defmodule ApiTest.MixProject do
+defmodule UserManagement.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :api_test,
+      app: :user_management,
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule ApiTest.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {ApiTest.Application, []}
+      mod: {UserManagement.Application, []}
     ]
   end
 
@@ -32,6 +32,7 @@ defmodule ApiTest.MixProject do
       {:timex, "~> 3.7.3"},
       {:joken, "~> 2.0"},
       {:pbkdf2_elixir, "~> 1.3.0"},
+      {:elixir_uuid, "~> 1.2.1"},
     ]
   end
 end

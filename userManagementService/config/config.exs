@@ -1,11 +1,14 @@
 use Mix.Config
 
-config :api_test,
+config :user_management,
   db_host: "localhost",
   db_port: 27017,
   db_db: "jobportal",
   db_tables: [
-    "user"
+    "user",
+    "company",
+    "company_employee",
+    "request"
   ],
 
 api_host: "localhost",

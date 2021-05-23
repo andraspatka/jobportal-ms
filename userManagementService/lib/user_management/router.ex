@@ -11,6 +11,7 @@ defmodule Api.Router do
   plug(:dispatch)
 
   forward("/users", to: Api.UserEndpoint)
+  forward("/tokeninfo", to: Api.JwtValidation)
 
   match _ do
     conn
