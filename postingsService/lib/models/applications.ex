@@ -1,5 +1,5 @@
 defmodule Api.Models.Applications do
-  @db_name Application.get_env(:api_test, :db_db)
+  @db_name Application.get_env(:postings_management, :db_db)
   @db_table "application"
 
   alias Api.Helpers.MapHelper

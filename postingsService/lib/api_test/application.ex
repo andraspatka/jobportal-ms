@@ -1,4 +1,4 @@
-defmodule ApiTest.Application do
+defmodule PostingsManagement.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -18,10 +18,10 @@ defmodule ApiTest.Application do
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: ApiTest.Supervisor]
+    opts = [strategy: :one_for_one, name: PostingsManagement.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
-  defp api_port, do: Application.get_env(:api_test, :api_port)
-  defp db, do: Application.get_env(:api_test, :db_db)
+  defp api_port, do: Application.get_env(:postings_management, :api_port)
+  defp db, do: Application.get_env(:postings_management, :db_db)
 end
