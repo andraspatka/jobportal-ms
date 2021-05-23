@@ -30,9 +30,7 @@ defmodule Api.UserEndpoint do
   end
 
   get "/", private: %{view: UserView}  do
-    params = Map.get(conn.params, "filter", %{})
-
-    {_, users} =  User.find_all(params)
+    {_, users} =  User.find_all(%{})
 
     conn
     |> put_status(200)
@@ -86,7 +84,7 @@ defmodule Api.UserEndpoint do
             true ->
               {:ok, service} = Api.Service.Auth.start_link
               token = Api.Service.Auth.issue_token(service,
-                %{:email => email, :role => user.role, :firstname => user.first_name, :lastname => user.last_name})
+                %{:uuid => user.id, :email => email, :role => user.role, :firstname => user.firstname, :lastname => user.lastname})
 
               conn
               |> put_status(200)
@@ -149,7 +147,7 @@ defmodule Api.UserEndpoint do
   post "/register", private: @skip_token_verification, private: %{view: UserView} do
     IO.puts("Registration request...")
     {:ok, service} = Api.Service.Auth.start_link
-    {email, password, first_name, last_name, role, company} = {
+    {email, password, firstname, lastname, role, company} = {
       Map.get(conn.params, "email", nil),
       Api.Service.Auth.generate_hash(service, Map.get(conn.params, "password", nil)),
       Map.get(conn.params, "firstname", nil),
@@ -160,7 +158,7 @@ defmodule Api.UserEndpoint do
 
     id = UUID.uuid1()
 
-    IO.puts("Registration request: #{email}, #{first_name}, #{last_name}, #{role}, #{company}")
+    IO.puts("Registration request: #{email}, #{firstname}, #{lastname}, #{role}, #{company}")
     cond do
       is_nil(email) ->
         IO.puts("Email missing")
@@ -174,13 +172,13 @@ defmodule Api.UserEndpoint do
         |> put_status(400)
         |> assign(:jsonapi, %{error: "password must be present!"})
 
-      is_nil(first_name) ->
+      is_nil(firstname) ->
         IO.puts("First name missing")
         conn
         |> put_status(400)
         |> assign(:jsonapi, %{error: "firstname must be present!"})
 
-      is_nil(last_name) ->
+      is_nil(lastname) ->
         IO.puts("Last name missing")
         conn
         |> put_status(400)
@@ -210,7 +208,7 @@ defmodule Api.UserEndpoint do
 
 
       true ->
-        case %User{id: id, email: email, password: password, first_name: first_name, last_name: last_name, role: role, company: company} |> User.save do
+        case %User{id: id, email: email, password: password, firstname: firstname, lastname: lastname, role: role, company: company} |> User.save do
           {:ok, createdEntry} ->
             {:ok, company_employee} = %CompanyEmployee{company_name: company, user_id: id} |> CompanyEmployee.save
             uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"

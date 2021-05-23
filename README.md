@@ -59,6 +59,7 @@ curl -X GET -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlb
 # Some test data
 
 ```bash
-db.user.insert({"company" : "NTT Data", "created_at" : 1621715109, "email" : "joe@ntt.data.com", "first_name" : "John", "id" : "af711ff0-bb26-11eb-902a-708bcd51d01d", "last_name" : "Doe", "password" : "$pbkdf2-sha512$160000$5WM8kM3OFdzbe7I5G1nItQ$pnAlSCEwIz2UdfBdfWQFHf3r3biPVeiqYDZRFi1qKPz23pt2rzouAHsNTYT5NTyL7Um9URIFVBpcdUiTLECYNw", "role" : "1", "updated_at" : 1621715109 })
+db.user.insert({"company" : "NTT Data", "created_at" : 1621715109, "email" : "joe@ntt.data.com", "firstname" : "John", "id" : "af711ff0-bb26-11eb-902a-708bcd51d01d", "lastname" : "Doe", "password" : "$pbkdf2-sha512$160000$5WM8kM3OFdzbe7I5G1nItQ$pnAlSCEwIz2UdfBdfWQFHf3r3biPVeiqYDZRFi1qKPz23pt2rzouAHsNTYT5NTyL7Um9URIFVBpcdUiTLECYNw", "role" : "1", "updated_at" : 1621715109 })
 db.company.insert({name: "NTT Data", admin: "af711ff0-bb26-11eb-902a-708bcd51d01d"})
+db.company_employee.insert({company_name: "NTT Data", user_id: "af711ff0-bb26-11eb-902a-708bcd51d01d"})
 ```
