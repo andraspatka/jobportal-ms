@@ -3,7 +3,7 @@ defmodule Postings.MixProject do
 
   def project do
     [
-      app: :api_test,
+      app: :postings_management,
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule Postings.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {ApiTest.Application, []}
+      mod: {PostingsManagement.Application, []}
     ]
   end
 

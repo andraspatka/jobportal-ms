@@ -5,9 +5,9 @@ defmodule Api.PostingEndpoint do
   alias Api.Models.Posting
   alias Api.Plugs.JsonTestPlug
 
-  @api_port Application.get_env(:api_test, :api_port)
-  @api_host Application.get_env(:api_test, :api_host)
-  @api_scheme Application.get_env(:api_test, :api_scheme)
+  @api_port Application.get_env(:postings_management, :api_port)
+  @api_host Application.get_env(:postings_management, :api_host)
+  @api_scheme Application.get_env(:postings_management, :api_scheme)
 
   @skip_token_verification %{jwt_skip: true}
 

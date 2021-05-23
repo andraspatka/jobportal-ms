@@ -1,6 +1,6 @@
 use Mix.Config
 
-config :api_test,
+config :postings_management,
   db_host: "localhost",
   db_port: 27017,
   db_db: "postings",
