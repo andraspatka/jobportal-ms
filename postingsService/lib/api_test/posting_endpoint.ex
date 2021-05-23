@@ -219,7 +219,7 @@ defmodule Api.PostingEndpoint do
           :error ->
             conn
             |> put_status(500)
-            |> assign(:jsonapi, %{body: "An unexpected error happened"})
+            |> assign(:jsonapi, %{body: "An unexpected error happened."})
         end
     end
   end

@@ -5,8 +5,6 @@ defmodule Api.Models.Applications do
   alias Api.Helpers.MapHelper
 
   use Api.Models.Base
-  #INFO: mongo also has an internal ID
-  #ignored in this exercise
   defstruct [
     :id,
     :date_applied,
@@ -14,7 +12,9 @@ defmodule Api.Models.Applications do
     :work_experience,
     :education,
     :user_id,
-    :posting_id
+    :posting_id,
+    :created_at,
+    :updated_at
   ]
 
 

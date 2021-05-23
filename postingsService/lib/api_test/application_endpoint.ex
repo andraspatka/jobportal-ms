@@ -26,55 +26,42 @@ defmodule Api.ApplicationEndpoint do
        )
   end
 
-  delete "/:id",
-         private: %{
-           view: ApplicationView
-         }  do
-    {parsedId, ""} = Integer.parse(id)
-
-    case Applications.delete(parsedId) do
+  delete "/:id" do
+    case Applications.delete(id) do
       {:ok, application} ->
 
         conn
         |> put_status(200)
-        |> assign(:jsonapi, application)
+        |> assign(:jsonapi, %{body: "Application was successfully deleted."})
 
       :error ->
         conn
         |> put_status(404)
-        |> assign(:jsonapi, %{"error" => "'application' not found"})
+        |> assign(:jsonapi, %{body: "Application with the given id was not found."})
     end
   end
 
-  # TODO: application ID
   post "/",
        private: @skip_token_verification,
        private: %{
          view: ApplicationView
        } do
-    IO.puts("Adding a new application...")
+    IO.puts("Adding a new application.")
 
-    {id, numberYearsExperience, workingExperience, education, applicationDate, applicantId, postingId} = {
-      Map.get(conn.params, "id", nil),
+    {applicationDate, numberYearsExperience, workingExperience, education, applicantId, postingId} = {
+      Map.get(conn.params, "applicationDate", nil),
       Map.get(conn.params, "numberYearsExperience", nil),
       Map.get(conn.params, "workingExperience", nil),
       Map.get(conn.params, "education", nil),
-      Map.get(conn.params, "applicationDate", nil),
       Map.get(conn.params, "applicantId", nil),
       Map.get(conn.params, "postingId", nil)
     }
 
     IO.puts(
-      "New application request: #{id}, #{numberYearsExperience}, #{workingExperience}, #{education}, #{applicationDate}, #{
-        applicantId
-      }, #{postingId}"
-    )
+      "New application request: #{applicationDate}, #{numberYearsExperience}, #{workingExperience}, #{education},  #{
+        applicantId}, #{postingId}")
 
     cond do
-      is_nil(id) ->
-        conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{error: "Id must be present!"})
 
       is_nil(numberYearsExperience) ->
         conn
@@ -107,6 +94,7 @@ defmodule Api.ApplicationEndpoint do
         |> assign(:jsonapi, %{error: "Posting id must be present!"})
 
       true ->
+        id = UUID.uuid1()
         case %Applications{
                id: id,
                date_applied: applicationDate,
@@ -114,49 +102,76 @@ defmodule Api.ApplicationEndpoint do
                work_experience: workingExperience,
                education: education,
                user_id: applicantId,
-               posting_id: postingId
+               posting_id: postingId,
+               created_at: nil,
+               updated_at: nil
              }
              |> Applications.save do
-          {:ok, createdEntry} ->
-            uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
-            #not optimal
+          {:ok, created_entry} ->
 
             conn
-            |> put_resp_header("location", "#{uri}#{id}")
             |> put_status(201)
-            |> assign(:jsonapi, createdEntry)
+            |> assign(:jsonapi, created_entry)
           :error ->
             conn
             |> put_status(500)
-            |> assign(:jsonapi, %{"error" => "An unexpected error happened"})
+            |> assign(:jsonapi, %{body: "An unexpected error happened."})
         end
     end
   end
 
+  #  TODO see why is not working-> finds nothing
   get "/posting/:id",
       private: %{
         view: ApplicationView
       }  do
-    {postingId, ""} = Integer.parse(id)
+    IO.puts(id)
+    case Applications.findAll(%{posting_id: id}) do
+      {:ok, applications} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, applications)
+      {:error, []} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, [])
+    end
 
-    {_, applications} = Applications.find(%{posting_id: postingId})
 
-    conn
-    |> put_status(200)
-    |> assign(:jsonapi, applications)
   end
 
+#  TODO see why is not working-> finds nothing
   get "/user/:id",
       private: %{
         view: ApplicationView
       }  do
-    {userId, ""} = Integer.parse(id)
+    case Applications.findAll(%{user_id: id}) do
+      {:ok, applications} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, applications)
+      {:error, []} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, [])
+    end
+  end
 
-    {_, applications} = Applications.find(%{user_id: userId})
-
-    conn
-    |> put_status(200)
-    |> assign(:jsonapi, applications)
+  get "/",
+      private: %{
+        view: ApplicationView
+      }  do
+    params = Map.get(conn.params, "filter", %{})
+    case Applications.findAll(params) do
+      {:ok, applications} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, applications)
+      {:error, []} ->
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, [])
+    end
   end
 
 end
