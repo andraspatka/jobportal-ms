@@ -59,7 +59,9 @@ defmodule Api.ApplicationEndpoint do
 
     IO.puts(
       "New application request: #{applicationDate}, #{numberYearsExperience}, #{workingExperience}, #{education},  #{
-        applicantId}, #{postingId}")
+        applicantId
+      }, #{postingId}"
+    )
 
     cond do
 
@@ -120,7 +122,6 @@ defmodule Api.ApplicationEndpoint do
     end
   end
 
-  #  TODO see why is not working-> finds nothing
   get "/posting/:id",
       private: %{
         view: ApplicationView
@@ -140,7 +141,6 @@ defmodule Api.ApplicationEndpoint do
 
   end
 
-#  TODO see why is not working-> finds nothing
   get "/user/:id",
       private: %{
         view: ApplicationView

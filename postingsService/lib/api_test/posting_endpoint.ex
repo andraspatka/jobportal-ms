@@ -137,7 +137,7 @@ defmodule Api.PostingEndpoint do
        private: %{
          view: PostingView
        } do
-    IO.puts("Adding a new posting...")
+    IO.puts("Adding a new posting.")
 
     {postedById, postedAt, deadline, numberOfViews, name, description, categoryId, requirements} = {
       Map.get(conn.params, "postedById", nil),
