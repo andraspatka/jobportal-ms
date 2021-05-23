@@ -5,8 +5,6 @@ defmodule Api.Models.Category do
   alias Api.Helpers.MapHelper
 
   use Api.Models.Base
-  #INFO: mongo also has an internal ID
-  #ignored in this exercise
   defstruct [
     :id,
     :name,

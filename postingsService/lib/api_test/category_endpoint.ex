@@ -42,24 +42,20 @@ defmodule Api.CategoryEndpoint do
   post "/",
        private: @skip_token_verification do
 
-    {id, name} = {
-      Map.get(conn.params, "id", nil),
+    {name} = {
       Map.get(conn.params, "name", nil)
     }
 
-    IO.puts("New category request: #{id}, #{name}")
+    IO.puts("New category request: #{name}")
 
     cond do
-      is_nil(id) ->
-        conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{error: "Id must be present!"})
       is_nil(name) ->
         conn
         |> put_status(400)
         |> assign(:jsonapi, %{error: "Name must be present!"})
 
       true ->
+        id = UUID.uuid1()
         case %Category{
                id: id,
                name: name,
