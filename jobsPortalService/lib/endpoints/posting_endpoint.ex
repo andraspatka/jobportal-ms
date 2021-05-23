@@ -2,10 +2,11 @@ defmodule Endpoints.PostingEndpoint do
 
     import Plug.Conn
     use Plug.Router
-    alias Routes.Base, as: Base
     alias Models.Postings
     alias Models.Category
     alias Models.Application
+    plug(:match)
+    plug(:dispatch)
 
     get "/postings" do
         getPostingUrl = "http://localhost:3000/postings"
@@ -26,11 +27,14 @@ defmodule Endpoints.PostingEndpoint do
     end
 
     delete "/postings/:id" do
-        deleteUrl = "http://localhost:3000/postings"
+        
         headers = []
-        params = %{id: id}
-        IO.inspect(params)
-        case HTTPoison.delete(deleteUrl, headers, params) do
+        {id} = {
+          Map.get(conn.path_params, "id", nil)
+        }
+        IO.inspect(id)
+        deleteUrl = "http://localhost:3000/postings"
+        case HTTPoison.delete(deleteUrl, headers, params: %{id: id}) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -47,6 +51,7 @@ defmodule Endpoints.PostingEndpoint do
     end
 
     post "/postings" do
+
         addUrl = "http://localhost:3000/postings"
 
         {postedById, postedAt, deadline, numberOfViews, name, description, 

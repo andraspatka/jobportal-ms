@@ -7,6 +7,9 @@ defmodule Endpoints.ApplicationEndpoint do
     alias Models.Category
     alias Models.Application
     
+    plug(:match)
+    plug(:dispatch)
+    
     #apply to posting
     post "/applications" do
         applyUrl = "http://localhost:3000/applications"

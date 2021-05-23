@@ -7,6 +7,9 @@ defmodule Endpoints.CategoryEndpoint do
     alias Models.Category
     alias Models.Application
 
+    plug(:match)
+    plug(:dispatch)
+    
     get "/categories" do
         getCategoriesUrl = "http://localhost:3000/categories"
 

@@ -36,7 +36,7 @@ defmodule Endpoints.AuthEndpoint do
     end
   end
 
-  post "register" do
+  post "/register" do
     registerUrl = 'http://localhost:4000/users/register'
     {email, password, firstname, lastname, role, company} =  {
       Map.get(conn.params, "email", nil),
