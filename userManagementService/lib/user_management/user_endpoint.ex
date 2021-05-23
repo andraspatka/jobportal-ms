@@ -3,11 +3,13 @@ defmodule Api.UserEndpoint do
 
   alias Api.Views.UserView
   alias Api.Models.User
+  alias Api.Models.CompanyEmployee
+  alias Api.Models.Company
   alias Api.Plugs.JsonTestPlug
 
-  @api_port Application.get_env(:api_test, :api_port)
-  @api_host Application.get_env(:api_test, :api_host)
-  @api_scheme Application.get_env(:api_test, :api_scheme)
+  @api_port Application.get_env(:user_management, :api_port)
+  @api_host Application.get_env(:user_management, :api_host)
+  @api_scheme Application.get_env(:user_management, :api_scheme)
 
   @skip_token_verification %{jwt_skip: true}
 
@@ -27,11 +29,10 @@ defmodule Api.UserEndpoint do
     Api.Service.Auth.verify_hash(service, {password, password_hash})
   end
 
-  # Todo, fix this, fix auth
   get "/", private: %{view: UserView}  do
     params = Map.get(conn.params, "filter", %{})
 
-    {_, users} =  User.find(params)
+    {_, users} =  User.find_all(params)
 
     conn
     |> put_status(200)
@@ -39,9 +40,7 @@ defmodule Api.UserEndpoint do
   end
 
   get "/:id", private: %{view: UserView}  do
-    {parsedId, ""} = Integer.parse(id)
-
-    case User.get(parsedId) do
+    case User.get(id) do
       {:ok, user} ->
 
         conn
@@ -86,7 +85,8 @@ defmodule Api.UserEndpoint do
 
             true ->
               {:ok, service} = Api.Service.Auth.start_link
-              token = Api.Service.Auth.issue_token(service, %{:email => email})
+              token = Api.Service.Auth.issue_token(service,
+                %{:email => email, :role => user.role, :firstname => user.first_name, :lastname => user.last_name})
 
               conn
               |> put_status(200)
@@ -143,30 +143,25 @@ defmodule Api.UserEndpoint do
         |> put_status(404)
         |> assign(:jsonapi, %{"error" => "User not found"})
     end
-
-
   end
 
 
   post "/register", private: @skip_token_verification, private: %{view: UserView} do
     IO.puts("Registration request...")
     {:ok, service} = Api.Service.Auth.start_link
-    password_hash = Api.Service.Auth.generate_hash(service, Map.get(conn.params, "password", nil))
-    {username, email, id, password} = {
-      Map.get(conn.params, "username", nil),
+    {email, password, first_name, last_name, role, company} = {
       Map.get(conn.params, "email", nil),
-      Map.get(conn.params, "id", nil),
-      password_hash
+      Api.Service.Auth.generate_hash(service, Map.get(conn.params, "password", nil)),
+      Map.get(conn.params, "firstname", nil),
+      Map.get(conn.params, "lastname", nil),
+      Map.get(conn.params, "role", nil),
+      Map.get(conn.params, "company", nil),
     }
 
-    IO.puts("Registration request: #{username}, #{email}, #{id}, #{password}")
-    cond do
-      is_nil(username) ->
-        IO.puts("Username missing")
-        conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{error: "username must be present!"})
+    id = UUID.uuid1()
 
+    IO.puts("Registration request: #{email}, #{first_name}, #{last_name}, #{role}, #{company}")
+    cond do
       is_nil(email) ->
         IO.puts("Email missing")
         conn
@@ -179,21 +174,45 @@ defmodule Api.UserEndpoint do
         |> put_status(400)
         |> assign(:jsonapi, %{error: "password must be present!"})
 
-      is_nil(id) ->
-        IO.puts("id missing")
+      is_nil(first_name) ->
+        IO.puts("First name missing")
         conn
         |> put_status(400)
-        |> assign(:jsonapi, %{error: "id must be present!"})
+        |> assign(:jsonapi, %{error: "firstname must be present!"})
+
+      is_nil(last_name) ->
+        IO.puts("Last name missing")
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{error: "lastname must be present!"})
+
+      is_nil(role) ->
+        IO.puts("Role missing")
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{error: "role must be present!"})
+
+      is_nil(company) ->
+        IO.puts("Company missing")
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{error: "company must be present!"})
 
       User.find(%{email: email}) != :error ->
         conn
         |> put_status(409)
         |> assign(:jsonapi, %{error: "email already exists in the db!"})
 
+      Company.find(%{name: company}) == :error ->
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{error: "Company not found!"})
+
 
       true ->
-        case %User{username: username, email: email, password: password, id: id} |> User.save do
+        case %User{id: id, email: email, password: password, first_name: first_name, last_name: last_name, role: role, company: company} |> User.save do
           {:ok, createdEntry} ->
+            {:ok, company_employee} = %CompanyEmployee{company_name: company, user_id: id} |> CompanyEmployee.save
             uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
             #not optimal
 

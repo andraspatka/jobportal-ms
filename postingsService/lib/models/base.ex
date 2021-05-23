@@ -47,9 +47,8 @@ defmodule Api.Models.Base do
       end
 
 
-      def find_all(filters) when is_map(filters) do
+      def findAll(filters) when is_map(filters) do
         cursor = Mongo.find(:mongo, @db_table, filters)
-
         case cursor |> Enum.to_list do
           [] ->
             {:error, []}
@@ -63,7 +62,7 @@ defmodule Api.Models.Base do
         {:ok, res} = Mongo.delete_one(:mongo, @db_table, %{id: id})
 
         if res.deleted_count  > 0 do
-         :ok
+          {:ok, res}
         else
          :error
         end

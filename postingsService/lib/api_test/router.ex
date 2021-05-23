@@ -10,7 +10,9 @@ defmodule Api.Router do
   )
   plug(:dispatch)
 
-  forward("/users", to: Api.UserEndpoint)
+  forward("/applications", to: Api.ApplicationEndpoint)
+  forward("/categories", to: Api.CategoryEndpoint)
+  forward("/postings", to: Api.PostingEndpoint)
 
   match _ do
     conn

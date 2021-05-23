@@ -1,2 +1,0 @@
-defmodule ApiTest do
-end
