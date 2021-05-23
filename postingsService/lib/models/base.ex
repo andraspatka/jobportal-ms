@@ -68,7 +68,6 @@ defmodule Api.Models.Base do
         end
       end
 
-
       defp merge_to_struct(document) when is_map(document) do
          __struct__ |> Map.merge(document)
       end
