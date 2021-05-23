@@ -8,47 +8,46 @@ defmodule Endpoints.PostingEndpoint do
     alias Models.Application
 
     get "/postings" do
-        getPostingUrl = ""
+        getPostingUrl = "http://localhost:3000/postings"
         case HTTPoison.get(getPostingUrl) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal erro"})
+          {:ok, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(200, response.body)
+          {:not_found, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(404, response.body)
+          {:error, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(500, response.body)
         end
     end
 
-
     delete "/postings/:id" do
-        deleteUrl = ""
+        deleteUrl = "http://localhost:3000/postings"
         headers = []
         params = %{id: id}
         IO.inspect(params)
         case HTTPoison.delete(deleteUrl, headers, params) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal erro"})
+          {:ok, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(200, response.body)
+          {:not_found, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(404, response.body)
+          {:error, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(500, response.body)
         end
     end
 
     post "/postings" do
-        addUrl = ""
+        addUrl = "http://localhost:3000/postings"
         posting_data = %Postings{postedById: postedById, postedAt: postedAt,
         deadline: deadline,
         numberOfViews: numberOfViews,
@@ -61,24 +60,24 @@ defmodule Endpoints.PostingEndpoint do
         headers = [{"Content-type", "application/json"}]
 
         case HTTPoison.post(addUrl, body, headers, []) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal error"})
+          {:ok, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(200, response.body)
+          {:not_found, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(404, response.body)
+          {:error, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(500, response.body)
         end
     end
 
 
     patch "/postings" do
-        updateUrl=""
+        updateUrl="http://localhost:3000/postings"
 
         update_data = %Postings{id: id,  deadline: deadline, name: name, description: description, 
         requirements: requirements} = conn
@@ -87,131 +86,19 @@ defmodule Endpoints.PostingEndpoint do
         headers = [{"Content-type", "application/json"}]
 
 
-        case HTTPoison.post(updateUrl, body, headers, []) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal error"})
-        end
-    end
-
-    get "/categories" do
-        getCategoriesUrl = ""
-
-        case HTTPoison.get(getCategoriesUrl) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal erro"})
-        end
-    end
-
-    #apply to posting
-    post "/applications" do
-        applyUrl = ""
-
-        application_data = %Application{numberYearsExperience: numberYearsExperience,
-        workingExperience: workingExperience,
-        education: education,
-        applicationDate: applicationDate,
-        applicantId: applicantId,
-        postingId: postingId} = conn
-
-        body = Poison.encode!(application_data)
-        headers = [{"Content-type", "application/json"}]
-
-        case HTTPoison.post(applyUrl, body, headers, []) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal error"})
-        end
-    end
-
-
-    #fetch applications for specific userId
-    get "/applications/user/:id" do
-        fetchUrl=""
-        params = %{id: id}
-        IO.inspect(params)
-        case HTTPoison.get(fetchUrl,[],params) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal erro"})
-        end
-    end
-
-    #fetch application for specific postingId
-    get "/applications/posting/:postingId" do
-        fetchUrl=""
-        params = %{id: postingId}
-        IO.inspect(params)
-        case HTTPoison.get(fetchUrl,[],params) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal erro"})
-        end
-    end
-
-    delete "/applications/:id" do
-        deleteUrl = ""
-        params = %{id: id}
-        IO.inspect(params)
-        case HTTPoison.delete(deleteUrl, [], params) do
-            {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, body)
-            {:not_found, %HTTPoison.Response{status_code: 404}} ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"not found" => "not found"})
-            {:error, %HTTPoison.Error{reason: reason}} ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "internal erro"})
+        case HTTPoison.patch(updateUrl, body, headers, []) do
+          {:ok, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(200, response.body)
+          {:not_found, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(404, response.body)
+          {:error, response} ->
+            conn
+              |> put_resp_content_type("application/json")
+              |> send_resp(500, response.body)
         end
     end
 end

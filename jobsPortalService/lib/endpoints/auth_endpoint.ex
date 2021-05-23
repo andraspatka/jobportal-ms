@@ -14,52 +14,56 @@ defmodule Endpoints.AuthEndpoint do
   post "/login"  do
     loginUrl =  'http://localhost:4000/users/login'
     { email, password } = {
-        Map.get(conn.params, "email", nil),
-        Map.get(conn.params, "password", nil)
+      Map.get(conn.params, "email", nil),
+      Map.get(conn.params, "password", nil)
     }
     body = Poison.encode!(%Login{email: email, password: password})
     headers = [{"Content-type", "application/json"}]
     
     case HTTPoison.post(loginUrl, body, headers) do
-      {:ok, %HTTPoison.Response{body: body}} ->
+      {:ok, response} ->
         conn
-        |> put_status(200)
-        |> assign(:jsonapi, body)
-      {:not_found, %HTTPoison.Response{status_code: 404}} ->
+          |> put_resp_content_type("application/json")
+          |> send_resp(200, response.body)
+      {:not_found, response} ->
         conn
-        |> put_status(404)
-        |> assign(:jsonapi, %{"not found" => "not found"})
-      {:error, %HTTPoison.Error{reason: reason}} ->
+          |> put_resp_content_type("application/json")
+          |> send_resp(404, response.body)
+      {:error, response} ->
         conn
-        |> put_status(500)
-        |> assign(:jsonapi, %{"error" => "internal erro"})
+          |> put_resp_content_type("application/json")
+          |> send_resp(500, response.body)
     end
   end
 
   post "register" do
     registerUrl = 'http://localhost:4000/users/register'
+    {email, password, firstname, lastname, role, company} =  {
+      Map.get(conn.params, "email", nil),
+      Map.get(conn.params, "password", nil),
+      Map.get(conn.params, "firstname", nil),
+      Map.get(conn.params, "lastname", nil),
+      Map.get(conn.params, "role", nil),
+      Map.get(conn.params, "company", nil)
 
-    register_data= %Register{email: email, password: password, firstname: firstname, 
-    lastname: lastname, role: role, company: company} = conn
-
-    body = Poison.encode!(register_data)
+    }
+    body = Poison.encode!(%Register{email: email, password: password,firstname: firstname,lastname: lastname,
+    role: role,company: company})
     headers = [{"Content-type", "application/json"}]
-
     case HTTPoison.post(registerUrl, body, headers, []) do
-      {:ok, %HTTPoison.Response{body: body}} ->
+      {:ok, response} ->
         conn
-        |> put_status(200)
-        |> assign(:jsonapi, body)
-      {:not_found, %HTTPoison.Response{status_code: 404}} ->
+          |> put_resp_content_type("application/json")
+          |> send_resp(200, response.body)
+      {:not_found, response} ->
         conn
-        |> put_status(404)
-        |> assign(:jsonapi, %{"not found" => "not found"})
-      {:error, %HTTPoison.Error{reason: reason}} ->
+          |> put_resp_content_type("application/json")
+          |> send_resp(404, response.body)
+      {:error, response} ->
         conn
-        |> put_status(500)
-        |> assign(:jsonapi, %{"error" => "internal erro"})
+          |> put_resp_content_type("application/json")
+          |> send_resp(500, response.body)
     end
-
   end
 
   get "/companies" do
@@ -82,21 +86,4 @@ defmodule Endpoints.AuthEndpoint do
         |> assign(:jsonapi, %{"error" => "internal erro"})
     end
   end
-
-  # defp message do
-  #   %{
-  #     status: "OK",
-  #     body: "Hello World"
-  #   }
-  # end
-
-  # get "/" do
-  #   send(conn, 200, @mock_data)
-  # end
-
-  # get "/" do
-  #   conn
-  #   |> put_resp_content_type("application/json")
-  #   |> send_resp(200, Poison.encode!(message()))
-  # end
 end
