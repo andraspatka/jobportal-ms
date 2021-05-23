@@ -48,15 +48,27 @@ defmodule Endpoints.PostingEndpoint do
 
     post "/postings" do
         addUrl = "http://localhost:3000/postings"
-        posting_data = %Postings{postedById: postedById, postedAt: postedAt,
+
+        {postedById, postedAt, deadline, numberOfViews, name, description, 
+        categoryId, requirements}  = {
+            Map.get(conn.params, "postedById", nil),
+            Map.get(conn.params, "postedAt", nil),
+            Map.get(conn.params, "deadline", nil),
+            Map.get(conn.params, "numberOfViews", nil),
+            Map.get(conn.params, "name", nil),
+            Map.get(conn.params, "description", nil),
+            Map.get(conn.params, "categoryId", nil),
+            Map.get(conn.params, "requirements", nil)
+        }
+
+        body = Poison.encode!( %Postings{postedById: postedById, postedAt: postedAt,
         deadline: deadline,
         numberOfViews: numberOfViews,
         name: name,
         description: description,
         categoryId: categoryId,
-        requirements: requirements} = conn
+        requirements: requirements})
 
-        body = Poison.encode!(posting_data)
         headers = [{"Content-type", "application/json"}]
 
         case HTTPoison.post(addUrl, body, headers, []) do
@@ -79,10 +91,16 @@ defmodule Endpoints.PostingEndpoint do
     patch "/postings" do
         updateUrl="http://localhost:3000/postings"
 
-        update_data = %Postings{id: id,  deadline: deadline, name: name, description: description, 
-        requirements: requirements} = conn
+        {id, deadline, name, description, requirements} = {
+          Map.get(conn.params, "id", nil),
+          Map.get(conn.params, "deadline", nil),
+          Map.get(conn.params, "name", nil),
+          Map.get(conn.params, "description", nil),
+          Map.get(conn.params, "requirements", nil),
+        }
 
-        body = Poison.encode!(update_data)
+        body = Poison.encode!(%Postings{id: id,  deadline: deadline, name: name, description: description, 
+        requirements: requirements})
         headers = [{"Content-type", "application/json"}]
 
 

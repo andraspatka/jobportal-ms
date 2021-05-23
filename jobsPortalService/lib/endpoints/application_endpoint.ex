@@ -6,11 +6,13 @@ defmodule Endpoints.ApplicationEndpoint do
     alias Models.Postings
     alias Models.Category
     alias Models.Application
+    
     #apply to posting
     post "/applications" do
         applyUrl = "http://localhost:3000/applications"
 
-        {numberYearsExperience, workingExperience, education, applicationDate, applicantId, postingId} = {
+        {numberYearsExperience, workingExperience, education, applicationDate,
+         applicantId, postingId} = {
             Map.get(conn.params, "numberYearsExperience", nil),
             Map.get(conn.params, "workingExperience", nil),
             Map.get(conn.params, "education", nil),
