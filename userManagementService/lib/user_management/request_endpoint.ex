@@ -7,6 +7,7 @@ defmodule Api.RequestEndpoint do
   alias Api.Models.Company
   alias Api.Models.Request
   alias Api.Plugs.JsonTestPlug
+  alias Api.Plugs.AuthPlug
 
   @api_port Application.get_env(:user_management, :api_port)
   @api_host Application.get_env(:user_management, :api_host)
@@ -23,9 +24,9 @@ defmodule Api.RequestEndpoint do
   @role_admin 2
 
   plug :match
+  plug AuthPlug
   plug :dispatch
   plug JsonTestPlug
-  plug Api.AuthPlug
   plug :encode_response
 
   defp encode_response(conn, _) do
@@ -44,14 +45,14 @@ defmodule Api.RequestEndpoint do
           {:error, _} ->
             :error
         end
-      _ ->
-        :error
     end
 
   end
 
   post "/", private: %{view: RequestView} do
-    requested_by = get_jwt_claims(get_req_header(conn, "authorization")).uuid
+    {:ok, claims} = get_jwt_claims(get_req_header(conn, "authorization"))
+    requested_by = claims.id
+
     IO.puts("Requested by uuid: #{requested_by}")
 
     id = UUID.uuid1()
@@ -78,16 +79,18 @@ defmodule Api.RequestEndpoint do
   end
 
   get "/", private: %{view: RequestView} do
-    user_id = get_jwt_claims(get_req_header(conn, "authorization")).uuid
-    user = User.find(%{id: user_id})
+    {:ok, claims} = get_jwt_claims(get_req_header(conn, "authorization"))
+    user_id = claims.id
+    {:ok, user} = User.find(%{id: user_id})
     cond do
       user.role != @role_admin ->
         conn
         |> put_status(403)
         |> assign(:jsonapi, %{"error" => "User is not an admin"})
     end
-    company = CompanyEmployee.find(%{user_id: user_id}).company_name
-    requests = Request.find(%{company: company, status: @status_unapproved})
+    {:ok, company_employee} = CompanyEmployee.find(%{user_id: user_id})
+    company = company_employee.company_name
+    {:ok, requests} = Request.find(%{company: company, status: @status_unapproved})
 
     conn
     |> put_status(200)

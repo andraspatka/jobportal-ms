@@ -10,7 +10,6 @@ defmodule Api.Router do
     pass: ["application/json"],
     json_decoder: Poison
   )
-  plug AuthPlug
   plug(:dispatch)
 
 
