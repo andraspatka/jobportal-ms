@@ -6,17 +6,19 @@ defmodule Api.UserEndpoint do
   alias Api.Models.CompanyEmployee
   alias Api.Models.Company
   alias Api.Plugs.JsonTestPlug
+  alias Api.Plugs.AuthPlug
+  alias Api.Service.Publisher
 
   @api_port Application.get_env(:user_management, :api_port)
   @api_host Application.get_env(:user_management, :api_host)
   @api_scheme Application.get_env(:user_management, :api_scheme)
 
   @skip_token_verification %{jwt_skip: true}
+  @routing_keys Application.get_env(:user_management, :routing_keys)
 
   plug :match
   plug :dispatch
   plug JsonTestPlug
-  plug Api.AuthPlug
   plug :encode_response
 
   defp encode_response(conn, _) do
@@ -86,6 +88,10 @@ defmodule Api.UserEndpoint do
               token = Api.Service.Auth.issue_token(service,
                 %{:uuid => user.id, :email => email, :role => user.role, :firstname => user.firstname, :lastname => user.lastname})
 
+              Publisher.publish(
+                @routing_keys |> Map.get("user_login"),
+                %{:id => user.id, :name => user.email})
+              # user |> Map.take([:id,:name]))
               conn
               |> put_status(200)
               |> assign(:jsonapi, %{:token => token})
