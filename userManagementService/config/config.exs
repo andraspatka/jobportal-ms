@@ -18,10 +18,11 @@ app_secret_key: "secret",
 jwt_validity: 3600,
 routing_keys: %{
   # User Events
-  "user_login" => "app.login.auth-login.events",
-  #"user_logout" => "api.login.auth-logout.events",
+  "user_login" => "jobportal.user.login.events",
+  "user_logout" => "jobportal.user.logout.events",
+  "user_register" => "jobportal.user.register.events",
 },
 
 event_url: "user:local-password@localhost", #username:passwd (here default)
-event_exchange: "my_api",
-event_queue: "auth_service"
+event_exchange: "logging",
+event_queue: "user_management"

@@ -128,6 +128,9 @@ defmodule Api.UserEndpoint do
           true ->
             case Api.Service.Auth.revoke_token(service, %{:email => email}) do
               :ok ->
+                Publisher.publish(
+                  @routing_keys |> Map.get("user_logout"),
+                  %{:id => user.id, :name => user.email})
                 conn
                 |> put_status(200)
                 |> assign(:jsonapi, %{"message" => "logged out: #{email}, token deleted"})
@@ -217,6 +220,9 @@ defmodule Api.UserEndpoint do
         case %User{id: id, email: email, password: password, firstname: firstname, lastname: lastname, role: role, company: company} |> User.save do
           {:ok, createdEntry} ->
             {:ok, company_employee} = %CompanyEmployee{company_name: company, user_id: id} |> CompanyEmployee.save
+            Publisher.publish(
+              @routing_keys |> Map.get("user_register"),
+              %{:id => id, :name => email})
             uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
             #not optimal
 
