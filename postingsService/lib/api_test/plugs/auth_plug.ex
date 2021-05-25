@@ -1,4 +1,4 @@
-defmodule Api.AuthPlug do
+defmodule Api.Plugs.AuthPlug do
   import Plug.Conn
 
   def init(opts), do: opts
@@ -10,8 +10,6 @@ defmodule Api.AuthPlug do
       true ->
         {:ok, service} = Api.Service.Auth.start_link
         headers = get_req_header(conn, "authorization")
-
-        #token = headers |> List.first |> String.split(" ") |> List.last
 
         case headers do
           ["Bearer " <> token] ->
