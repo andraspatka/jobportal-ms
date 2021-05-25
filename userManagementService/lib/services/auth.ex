@@ -27,6 +27,7 @@ defmodule Api.Service.Auth do
   end
 
   def issue_token(server, user) when is_map(user) do
+    GenServer.call(server, {:revoke_token, user})
     GenServer.call(server, {:issue_token, user})
   end
 

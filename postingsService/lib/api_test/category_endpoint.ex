@@ -4,12 +4,14 @@ defmodule Api.CategoryEndpoint do
   alias Api.Views.CategoryView
   alias Api.Models.Category
   alias Api.Plugs.JsonTestPlug
+  alias Api.Service.Publisher
 
   @api_port Application.get_env(:postings_management, :api_port)
   @api_host Application.get_env(:postings_management, :api_host)
   @api_scheme Application.get_env(:postings_management, :api_scheme)
 
   @skip_token_verification %{jwt_skip: true}
+  @routing_keys Application.get_env(:postings_management, :routing_keys)
 
   plug :match
   plug :dispatch
@@ -33,12 +35,17 @@ defmodule Api.CategoryEndpoint do
     params = Map.get(conn.params, "filter", %{})
     case Category.findAll(params) do
       {:ok, categories} ->
+        Publisher.publish(
+          @routing_keys
+          |> Map.get("categories_find_all"),
+          %{:id => "Categories", :name => "Find all categories."}
+        )
         conn
         |> put_status(200)
         |> assign(:jsonapi, categories)
       {:error, []} ->
         conn
-        |> put_status(200)
+        |> put_status(404)
         |> assign(:jsonapi, [])
     end
   end
@@ -68,9 +75,15 @@ defmodule Api.CategoryEndpoint do
              }
              |> Category.save do
           {:ok, created_entry} ->
+            Publisher.publish(
+              @routing_keys
+              |> Map.get("category_added"),
+              %{:id => id, :name => name}
+            )
             conn
             |> put_status(201)
             |> assign(:jsonapi, created_entry)
+
           :error ->
             conn
             |> put_status(500)

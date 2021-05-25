@@ -12,6 +12,7 @@ defmodule Api.Router do
 
   forward("/users", to: Api.UserEndpoint)
   forward("/tokeninfo", to: Api.JwtValidation)
+  forward("/requests", to: Api.RequestEndpoint)
 
   match _ do
     conn

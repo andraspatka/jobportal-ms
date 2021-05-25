@@ -4,12 +4,14 @@ defmodule Api.ApplicationEndpoint do
   alias Api.Views.ApplicationView
   alias Api.Models.Applications
   alias Api.Plugs.JsonTestPlug
+  alias Api.Service.Publisher
 
   @api_port Application.get_env(:postings_management, :api_port)
   @api_host Application.get_env(:postings_management, :api_host)
   @api_scheme Application.get_env(:postings_management, :api_scheme)
 
   @skip_token_verification %{jwt_skip: true}
+  @routing_keys Application.get_env(:postings_management, :routing_keys)
 
   plug :match
   plug :dispatch
@@ -31,6 +33,11 @@ defmodule Api.ApplicationEndpoint do
       {:ok, application} ->
 
         conn
+        Publisher.publish(
+          @routing_keys
+          |> Map.get("applications_delete"),
+          %{:id => id, :name => "User deleted."}
+        )
         |> put_status(200)
         |> assign(:jsonapi, %{body: "Application was successfully deleted."})
 
@@ -59,7 +66,9 @@ defmodule Api.ApplicationEndpoint do
 
     IO.puts(
       "New application request: #{applicationDate}, #{numberYearsExperience}, #{workingExperience}, #{education},  #{
-        applicantId}, #{postingId}")
+        applicantId
+      }, #{postingId}"
+    )
 
     cond do
 
@@ -108,7 +117,11 @@ defmodule Api.ApplicationEndpoint do
              }
              |> Applications.save do
           {:ok, created_entry} ->
-
+            Publisher.publish(
+              @routing_keys
+              |> Map.get("applications_add"),
+              %{:id => id, :name => created_entry.user_id}
+            )
             conn
             |> put_status(201)
             |> assign(:jsonapi, created_entry)
@@ -120,7 +133,6 @@ defmodule Api.ApplicationEndpoint do
     end
   end
 
-  #  TODO see why is not working-> finds nothing
   get "/posting/:id",
       private: %{
         view: ApplicationView
@@ -128,6 +140,11 @@ defmodule Api.ApplicationEndpoint do
     IO.puts(id)
     case Applications.findAll(%{posting_id: id}) do
       {:ok, applications} ->
+        Publisher.publish(
+          @routing_keys
+          |> Map.get("applications_get_for_posting"),
+          %{:id => id, :name => "Get all applications for posting."}
+        )
         conn
         |> put_status(200)
         |> assign(:jsonapi, applications)
@@ -140,13 +157,17 @@ defmodule Api.ApplicationEndpoint do
 
   end
 
-#  TODO see why is not working-> finds nothing
   get "/user/:id",
       private: %{
         view: ApplicationView
       }  do
     case Applications.findAll(%{user_id: id}) do
       {:ok, applications} ->
+        Publisher.publish(
+          @routing_keys
+          |> Map.get("applications_get_for_user"),
+          %{:id => id, :name => "Get all applications for user."}
+        )
         conn
         |> put_status(200)
         |> assign(:jsonapi, applications)
@@ -164,6 +185,11 @@ defmodule Api.ApplicationEndpoint do
     params = Map.get(conn.params, "filter", %{})
     case Applications.findAll(params) do
       {:ok, applications} ->
+        Publisher.publish(
+          @routing_keys
+          |> Map.get("applications_find_all"),
+          %{:id => "Applications", :name => "Find all applications."}
+        )
         conn
         |> put_status(200)
         |> assign(:jsonapi, applications)

@@ -13,13 +13,16 @@ defmodule PostingsManagement.Application do
       # Starts a worker by calling: ApiTest.Worker.start_link(arg)
       # {ApiTest.Worker, arg}
       {Plug.Cowboy, scheme: :http, plug: Api.Router, options: [port: api_port]},
-      {Mongo, [name: :mongo, database: db, pool_size: 2]}
+      {Mongo, [name: :mongo, database: db, pool_size: 2]},
+      {Api.Service.Publisher, app_id: :postings_management},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: PostingsManagement.Supervisor]
     Supervisor.start_link(children, opts)
+
+#    Api.Service.Publisher.start_link()
   end
 
   defp api_port, do: Application.get_env(:postings_management, :api_port)

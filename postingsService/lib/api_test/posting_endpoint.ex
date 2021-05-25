@@ -4,12 +4,14 @@ defmodule Api.PostingEndpoint do
   alias Api.Views.PostingView
   alias Api.Models.Posting
   alias Api.Plugs.JsonTestPlug
+  alias Api.Service.Publisher
 
   @api_port Application.get_env(:postings_management, :api_port)
   @api_host Application.get_env(:postings_management, :api_host)
   @api_scheme Application.get_env(:postings_management, :api_scheme)
 
   @skip_token_verification %{jwt_skip: true}
+  @routing_keys Application.get_env(:postings_management, :routing_keys)
 
   plug :match
   plug :dispatch
@@ -34,12 +36,17 @@ defmodule Api.PostingEndpoint do
 
     case Posting.findAll(params) do
       {:ok, postings} ->
+        Publisher.publish(
+          @routing_keys
+          |> Map.get("postings_find_all"),
+          %{:id => "Postings", :name => "Find all postings."}
+        )
         conn
         |> put_status(200)
         |> assign(:jsonapi, postings)
       {:error, []} ->
         conn
-        |> put_status(200)
+        |> put_status(404)
         |> assign(:jsonapi, [])
     end
   end
@@ -47,6 +54,11 @@ defmodule Api.PostingEndpoint do
   delete "/:id" do
     case Posting.delete(id) do
       {:ok, posting} ->
+        Publisher.publish(
+          @routing_keys
+          |> Map.get("postings_delete"),
+          %{:id => id, :name => "Posting deleted"}
+        )
         conn
         |> put_status(200)
         |> assign(:jsonapi, %{body: "Posting was successfully deleted."})
@@ -64,7 +76,11 @@ defmodule Api.PostingEndpoint do
       }  do
     case Posting.get(id) do
       {:ok, posting} ->
-
+        Publisher.publish(
+          @routing_keys
+          |> Map.get("postings_get"),
+          %{:id => id, :name => posting.name}
+        )
         conn
         |> put_status(200)
         |> assign(:jsonapi, posting)
@@ -116,6 +132,11 @@ defmodule Api.PostingEndpoint do
                  }
                  |> Posting.save do
               {:ok, updated_entity} ->
+                Publisher.publish(
+                  @routing_keys
+                  |> Map.get("postings_update"),
+                  %{:id => id, :name => posting.name}
+                )
                 conn
                 |> put_status(201)
                 |> assign(:jsonapi, updated_entity)
@@ -137,7 +158,7 @@ defmodule Api.PostingEndpoint do
        private: %{
          view: PostingView
        } do
-    IO.puts("Adding a new posting...")
+    IO.puts("Adding a new posting.")
 
     {postedById, postedAt, deadline, numberOfViews, name, description, categoryId, requirements} = {
       Map.get(conn.params, "postedById", nil),
@@ -213,6 +234,11 @@ defmodule Api.PostingEndpoint do
              }
              |> Posting.save do
           {:ok, created_entity} ->
+            Publisher.publish(
+              @routing_keys
+              |> Map.get("postings_save"),
+              %{:id => id, :name => created_entity.name}
+            )
             conn
             |> put_status(201)
             |> assign(:jsonapi, created_entity)
