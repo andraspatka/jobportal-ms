@@ -83,7 +83,7 @@ defmodule Api.RequestEndpoint do
       role !== @role_admin ->
         conn
         |> put_status(403)
-        |> assign(:jsonapi, %{"error" => "User is not an admin"})
+        |> assign(:jsonapi, %{"error" => "User is not an admin!"})
       true ->
         {:ok, company_employee} = CompanyEmployee.find(%{user_id: user_id})
         company = company_employee.company_name
@@ -92,6 +92,60 @@ defmodule Api.RequestEndpoint do
         conn
         |> put_status(200)
         |> assign(:jsonapi, requests)
+    end
+  end
+
+  patch "/", private: %{view: RequestView} do
+    {requestee_id, status} = {
+      Map.get(conn.params, "id", nil),
+      Map.get(conn.params, "status", nil),
+    }
+    claims = get_jwt_claims(get_req_header(conn, "authorization"))
+    {role, _} = Integer.parse(claims.role)
+    cond do
+      role !== @role_admin ->
+        conn
+        |> put_status(403)
+        |> assign(:jsonapi, %{"error" => "User is not an admin!"})
+      true ->
+        {:ok, company_employee} = CompanyEmployee.find(%{user_id: requestee_id})
+        requestee_company = company_employee.company_name
+        {:ok, admin_company_employee} = CompanyEmployee.find(%{user_id: claims.id})
+        admin_company = admin_company_employee.company_name
+
+        if admin_company === requestee_company do
+          conn
+          |> put_status(400)
+          |> assign(:jsonapi, %{"error" => "Incorrect admin! Not admin of company: #{requestee_company}"})
+        else
+          case
+            Request.find(%{company: requestee_company, status: @status_unapproved, requested_by: requestee_id}) do
+            {:ok, request} ->
+              Request.delete(request.id)
+              case %Request{
+                    id: request.id,
+                    approved_by: claims.id,
+                    approved_on: Timex.to_unix(Timex.now),
+                    company: request.company,
+                    created_at: request.created_at,
+                    requested_by: request.requested_by,
+                    status: status
+                   } |> Request.save do
+                {:ok, updated_entity} ->
+                  conn
+                  |> put_status(200)
+                  |> assign(:jsonapi, updated_entity)
+                :error ->
+                  conn
+                  |> put_status(500)
+                  |> assign(:jsonapi, %{"error" => "Request could not be updated!"})
+              end
+            :error ->
+              conn
+              |> put_status(404)
+              |> assign(:jsonapi, %{"error" => "No unapproved request for user with id #{requestee_id}"})
+          end
+        end
     end
   end
 end
