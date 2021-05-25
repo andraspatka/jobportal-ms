@@ -38,7 +38,7 @@ defmodule Api.CategoryEndpoint do
         Publisher.publish(
           @routing_keys
           |> Map.get("categories_find_all"),
-          %{:id => "Category", :name => "Category"}
+          %{:id => "Categories", :name => "Find all categories."}
         )
         conn
         |> put_status(200)
@@ -78,7 +78,7 @@ defmodule Api.CategoryEndpoint do
             Publisher.publish(
               @routing_keys
               |> Map.get("category_added"),
-              %{:id => "Category", :name => "Category"}
+              %{:id => id, :name => name}
             )
             conn
             |> put_status(201)
