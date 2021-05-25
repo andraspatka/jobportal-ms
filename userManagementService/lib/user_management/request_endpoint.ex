@@ -50,11 +50,8 @@ defmodule Api.RequestEndpoint do
   end
 
   post "/", private: %{view: RequestView} do
-    {:ok, claims} = get_jwt_claims(get_req_header(conn, "authorization"))
-    requested_by = claims.id
-
-    IO.puts("Requested by uuid: #{requested_by}")
-
+    claims = get_jwt_claims(get_req_header(conn, "authorization"))
+    requested_by = claims.uuid
     id = UUID.uuid1()
     cond do
       User.find(%{id: requested_by}) == :error ->
@@ -79,21 +76,22 @@ defmodule Api.RequestEndpoint do
   end
 
   get "/", private: %{view: RequestView} do
-    {:ok, claims} = get_jwt_claims(get_req_header(conn, "authorization"))
-    user_id = claims.id
-    {:ok, user} = User.find(%{id: user_id})
+    claims = get_jwt_claims(get_req_header(conn, "authorization"))
+    user_id = claims.uuid
+    {role, _} = Integer.parse(claims.role)
     cond do
-      user.role != @role_admin ->
+      role !== @role_admin ->
         conn
         |> put_status(403)
         |> assign(:jsonapi, %{"error" => "User is not an admin"})
-    end
-    {:ok, company_employee} = CompanyEmployee.find(%{user_id: user_id})
-    company = company_employee.company_name
-    {:ok, requests} = Request.find(%{company: company, status: @status_unapproved})
+      true ->
+        {:ok, company_employee} = CompanyEmployee.find(%{user_id: user_id})
+        company = company_employee.company_name
+        {:ok, requests} = Request.find_all(%{company: company, status: @status_unapproved})
 
-    conn
-    |> put_status(200)
-    |> assign(:jsonapi, requests)
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, requests)
+    end
   end
 end
