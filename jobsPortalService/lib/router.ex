@@ -1,8 +1,7 @@
 defmodule Router do
   use Plug.Router
-
+  plug CORSPlug, origin: ["http://localhost:4200"]
   plug(:match)
-
   plug(Plug.Parsers,
     parsers: [:json],
     pass: ["application/json"],

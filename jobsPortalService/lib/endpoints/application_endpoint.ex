@@ -3,7 +3,6 @@ defmodule Endpoints.ApplicationEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Application
-    
     plug(:match)
     plug(:dispatch)
 

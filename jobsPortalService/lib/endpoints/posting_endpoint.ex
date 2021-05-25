@@ -3,7 +3,6 @@ defmodule Endpoints.PostingEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Postings
-
     plug(:match)
     plug(:dispatch)
 

@@ -3,7 +3,6 @@ defmodule Endpoints.CategoryEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Category
-
     plug(:match)
     plug(:dispatch)
 
