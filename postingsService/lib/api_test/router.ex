@@ -1,6 +1,8 @@
 defmodule Api.Router do
   use Plug.Router
 
+#  alias Api.Plugs.AuthPlug
+
   plug(:match)
 
   plug(Plug.Parsers,
