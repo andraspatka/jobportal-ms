@@ -19,9 +19,7 @@ defmodule Api.RequestEndpoint do
   @status_approved "APPROVED"
   @status_rejected "REJECTED"
 
-  @role_employee 0
-  @role_employer 1
-  @role_admin 2
+  @roles Application.get_env(:user_management, :roles)
 
   plug :match
   plug AuthPlug
@@ -80,7 +78,7 @@ defmodule Api.RequestEndpoint do
     user_id = claims.uuid
     {role, _} = Integer.parse(claims.role)
     cond do
-      role !== @role_admin ->
+      role !== @roles.admin ->
         conn
         |> put_status(403)
         |> assign(:jsonapi, %{"error" => "User is not an admin!"})
@@ -103,23 +101,22 @@ defmodule Api.RequestEndpoint do
     claims = get_jwt_claims(get_req_header(conn, "authorization"))
     {role, _} = Integer.parse(claims.role)
     cond do
-      role !== @role_admin ->
+      role !== @roles.admin ->
         conn
         |> put_status(403)
         |> assign(:jsonapi, %{"error" => "User is not an admin!"})
       true ->
         {:ok, company_employee} = CompanyEmployee.find(%{user_id: requestee_id})
         requestee_company = company_employee.company_name
-        {:ok, admin_company_employee} = CompanyEmployee.find(%{user_id: claims.id})
+        {:ok, admin_company_employee} = CompanyEmployee.find(%{user_id: claims.uuid})
         admin_company = admin_company_employee.company_name
-
+        # TODO: This comparison not working yet
         if admin_company === requestee_company do
           conn
           |> put_status(400)
           |> assign(:jsonapi, %{"error" => "Incorrect admin! Not admin of company: #{requestee_company}"})
         else
-          case
-            Request.find(%{company: requestee_company, status: @status_unapproved, requested_by: requestee_id}) do
+          case Request.find(%{company: requestee_company, status: @status_unapproved, requested_by: requestee_id}) do
             {:ok, request} ->
               Request.delete(request.id)
               case %Request{
@@ -132,6 +129,16 @@ defmodule Api.RequestEndpoint do
                     status: status
                    } |> Request.save do
                 {:ok, updated_entity} ->
+                  # TODO: Verify if user exists, verify if status is correct
+                  {:ok, employee} = User.find(%{id: requestee_id})
+                  User.delete(employee.id)
+                  %User{id: employee.id,
+                    email: employee.email,
+                    password: employee.password,
+                    firstname: employee.firstname,
+                    role: @roles.employer,
+                    created_at: employee.created_at} |> User.save
+
                   conn
                   |> put_status(200)
                   |> assign(:jsonapi, updated_entity)

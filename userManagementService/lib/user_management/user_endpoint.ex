@@ -15,6 +15,7 @@ defmodule Api.UserEndpoint do
 
   @skip_token_verification %{jwt_skip: true}
   @routing_keys Application.get_env(:user_management, :routing_keys)
+  @roles Application.get_env(:user_management, :roles)
 
   plug :match
   plug :dispatch
@@ -152,7 +153,8 @@ defmodule Api.UserEndpoint do
     end
   end
 
-
+# TODO: Mapping user to userview not working, privates should probably be in one map
+# -> Password hashes should not be returned!
   post "/register", private: @skip_token_verification, private: %{view: UserView} do
     IO.puts("Registration request...")
     {:ok, service} = Api.Service.Auth.start_link
@@ -164,9 +166,9 @@ defmodule Api.UserEndpoint do
       Map.get(conn.params, "role", nil),
       Map.get(conn.params, "company", nil),
     }
-
+    {int_role, _} = Integer.parse(role)
     id = UUID.uuid1()
-
+    IO.puts("#{int_role == @roles.admin}")
     IO.puts("Registration request: #{email}, #{firstname}, #{lastname}, #{role}, #{company}")
     cond do
       is_nil(email) ->
@@ -205,6 +207,11 @@ defmodule Api.UserEndpoint do
         |> put_status(400)
         |> assign(:jsonapi, %{error: "company must be present!"})
 
+      int_role == @roles.admin ->
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{error: "Can't assign this role to a user via this API!"})
+
       User.find(%{email: email}) != :error ->
         conn
         |> put_status(409)
@@ -217,19 +224,20 @@ defmodule Api.UserEndpoint do
 
 
       true ->
-        case %User{id: id, email: email, password: password, firstname: firstname, lastname: lastname, role: role, company: company} |> User.save do
-          {:ok, createdEntry} ->
+        case %User{id: id, email: email, password: password, firstname: firstname, lastname: lastname, role: role} |> User.save do
+          {:ok, created_entry} ->
             {:ok, company_employee} = %CompanyEmployee{company_name: company, user_id: id} |> CompanyEmployee.save
             Publisher.publish(
               @routing_keys |> Map.get("user_register"),
               %{:id => id, :name => email})
+
             uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
             #not optimal
 
             conn
             |> put_resp_header("location", "#{uri}#{id}")
             |> put_status(201)
-            |> assign(:jsonapi, createdEntry)
+            |> assign(:jsonapi, created_entry)
           :error ->
             conn
             |> put_status(500)

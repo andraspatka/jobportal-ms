@@ -13,7 +13,6 @@ defmodule Api.Models.User do
     :firstname,
     :lastname,
     :role,
-    :company,
     :created_at,
     :updated_at,
   ]
