@@ -3,6 +3,7 @@ defmodule Endpoints.PostingEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Postings
+    plug CORSPlug, origin: ["http://localhost:4200"]
     plug(:match)
     plug(:dispatch)
 

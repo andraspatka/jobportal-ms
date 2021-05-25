@@ -1,6 +1,5 @@
 defmodule Router do
   use Plug.Router
-  plug CORSPlug, origin: ["http://localhost:4200"]
   plug(:match)
   plug(Plug.Parsers,
     parsers: [:json],
@@ -10,12 +9,16 @@ defmodule Router do
 
   plug(:dispatch)
 
-  forward("/auth", to: Endpoints.AuthEndpoint)
-  forward("/posting", to: Endpoints.PostingEndpoint)
-  forward("/application", to: Endpoints.ApplicationEndpoint)
-  forward("/category", to: Endpoints.CategoryEndpoint)
+
+
+    forward("/auth", to: Endpoints.AuthEndpoint)
+    forward("/posting", to: Endpoints.PostingEndpoint)
+    forward("/application", to: Endpoints.ApplicationEndpoint)
+    forward("/category", to: Endpoints.CategoryEndpoint)
+
   match _ do
     conn
     |> send_resp(404, Poison.encode!(%{message: "Not Found"}))
   end
+
 end

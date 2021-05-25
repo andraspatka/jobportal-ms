@@ -3,9 +3,9 @@ defmodule Endpoints.CategoryEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Category
+    plug CORSPlug, origin: ["http://localhost:4200"]
     plug(:match)
     plug(:dispatch)
-
     get "/categories" do
         getCategoriesUrl = "http://localhost:3000/categories"
 

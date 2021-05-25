@@ -2,13 +2,13 @@ defmodule Endpoints.AuthEndpoint do
 
   import Plug.Conn
   use Plug.Router
+  plug CORSPlug, origin: ["http://localhost:4200"]
   alias Routes.Base
   alias Models.Login
   alias Models.Register
   alias Models.Company
   plug(:match)
   plug(:dispatch)
-
   # @mock_data [%{"id" => 1, "title" => "Hello"}, %{"id" => 2, "title" => "world!"}]
 
   post "/login"  do

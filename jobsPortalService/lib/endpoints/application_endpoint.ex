@@ -3,9 +3,9 @@ defmodule Endpoints.ApplicationEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Application
+    plug CORSPlug, origin: ["http://localhost:4200"]
     plug(:match)
     plug(:dispatch)
-
     #apply to posting
     post "/applications" do
         applyUrl = "http://localhost:3000/applications"
