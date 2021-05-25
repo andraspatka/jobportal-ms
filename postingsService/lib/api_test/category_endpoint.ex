@@ -45,7 +45,7 @@ defmodule Api.CategoryEndpoint do
         |> assign(:jsonapi, categories)
       {:error, []} ->
         conn
-        |> put_status(200)
+        |> put_status(404)
         |> assign(:jsonapi, [])
     end
   end
