@@ -85,8 +85,7 @@ defmodule Api.RequestEndpoint do
       true ->
         {:ok, company_employee} = CompanyEmployee.find(%{user_id: user_id})
         company = company_employee.company_name
-        {:ok, requests} = Request.find_all(%{company: company, status: @status_unapproved})
-
+        {_, requests} = Request.find_all(%{company: company, status: @status_unapproved})
         conn
         |> put_status(200)
         |> assign(:jsonapi, requests)
@@ -105,13 +104,21 @@ defmodule Api.RequestEndpoint do
         conn
         |> put_status(403)
         |> assign(:jsonapi, %{"error" => "User is not an admin!"})
+      User.find(%{id: requestee_id}) === :error ->
+        conn
+        |> put_status(404)
+        |> assign(:jsonapi, %{"error" => "User with id: #{requestee_id} not found!"})
+      status !== @status_approved and status !== @status_rejected ->
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{"error" => "Status not found! Status should be: #{@status_approved} or #{@status_rejected}"})
       true ->
         {:ok, company_employee} = CompanyEmployee.find(%{user_id: requestee_id})
         requestee_company = company_employee.company_name
         {:ok, admin_company_employee} = CompanyEmployee.find(%{user_id: claims.uuid})
         admin_company = admin_company_employee.company_name
-        # TODO: This comparison not working yet
-        if admin_company === requestee_company do
+        IO.puts("requestee: #{requestee_company} admin: #{admin_company} #{admin_company === requestee_company}")
+        if admin_company !== requestee_company do
           conn
           |> put_status(400)
           |> assign(:jsonapi, %{"error" => "Incorrect admin! Not admin of company: #{requestee_company}"})
@@ -121,7 +128,7 @@ defmodule Api.RequestEndpoint do
               Request.delete(request.id)
               case %Request{
                     id: request.id,
-                    approved_by: claims.id,
+                    approved_by: claims.uuid,
                     approved_on: Timex.to_unix(Timex.now),
                     company: request.company,
                     created_at: request.created_at,
@@ -129,16 +136,17 @@ defmodule Api.RequestEndpoint do
                     status: status
                    } |> Request.save do
                 {:ok, updated_entity} ->
-                  # TODO: Verify if user exists, verify if status is correct
-                  {:ok, employee} = User.find(%{id: requestee_id})
-                  User.delete(employee.id)
-                  %User{id: employee.id,
-                    email: employee.email,
-                    password: employee.password,
-                    firstname: employee.firstname,
-                    role: @roles.employer,
-                    created_at: employee.created_at} |> User.save
-
+                  if status === @status_approved do
+                    {:ok, employee} = User.find(%{id: requestee_id})
+                    User.delete(employee.id)
+                    %User{id: employee.id,
+                      email: employee.email,
+                      password: employee.password,
+                      firstname: employee.firstname,
+                      lastname: employee.lastname,
+                      role: @roles.employer,
+                      created_at: employee.created_at} |> User.save
+                  end
                   conn
                   |> put_status(200)
                   |> assign(:jsonapi, updated_entity)
