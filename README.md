@@ -63,4 +63,17 @@ use users
 db.user.insert({"created_at" : 1621715109, "email" : "admin@ntt.data.com", "firstname" : "Admin", "id" : "af711ff0-bb26-11eb-902a-708bcd51d01d", "lastname" : "Doe", "password" : "$pbkdf2-sha512$160000$5WM8kM3OFdzbe7I5G1nItQ$pnAlSCEwIz2UdfBdfWQFHf3r3biPVeiqYDZRFi1qKPz23pt2rzouAHsNTYT5NTyL7Um9URIFVBpcdUiTLECYNw", "role" : "2", "updated_at" : 1621715109 })
 db.company.insert({name: "NTT Data", admin: "af711ff0-bb26-11eb-902a-708bcd51d01d"})
 db.company_employee.insert({company_name: "NTT Data", user_id: "af711ff0-bb26-11eb-902a-708bcd51d01d"})
+
+db.user.insert({"created_at" : 1621715109, "email" : "admin@msg.com", "firstname" : "Admin", "id" : "af711ff0-bb26-11eb-902a-708bcd51d01e", "lastname" : "Doe", "password" : "$pbkdf2-sha512$160000$5WM8kM3OFdzbe7I5G1nItQ$pnAlSCEwIz2UdfBdfWQFHf3r3biPVeiqYDZRFi1qKPz23pt2rzouAHsNTYT5NTyL7Um9URIFVBpcdUiTLECYNw", "role" : "2", "updated_at" : 1621715109 })
+db.company.insert({name: "msg", admin: "af711ff0-bb26-11eb-902a-708bcd51d01e"})
+db.company_employee.insert({company_name: "msg", user_id: "af711ff0-bb26-11eb-902a-708bcd51d01e"})
 ```
+
+# Flow
+
+- register as employee
+- log in as employee
+- send request to become employer
+- log in as admin
+- query requests
+- approve with admin: 8d41b900-bd9a-11eb-8ef8-708bcd51d01d

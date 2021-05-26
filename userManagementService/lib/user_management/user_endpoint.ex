@@ -18,6 +18,7 @@ defmodule Api.UserEndpoint do
   @roles Application.get_env(:user_management, :roles)
 
   plug :match
+  plug AuthPlug
   plug :dispatch
   plug JsonTestPlug
   plug :encode_response
@@ -88,11 +89,7 @@ defmodule Api.UserEndpoint do
               {:ok, service} = Api.Service.Auth.start_link
               token = Api.Service.Auth.issue_token(service,
                 %{:uuid => user.id, :email => email, :role => user.role, :firstname => user.firstname, :lastname => user.lastname})
-
-              Publisher.publish(
-                @routing_keys |> Map.get("user_login"),
-                %{:id => user.id, :name => user.email})
-              # user |> Map.take([:id,:name]))
+              Publisher.publish(@routing_keys.user_login, %{:id => user.id, :name => user.email})
               conn
               |> put_status(200)
               |> assign(:jsonapi, %{:token => token})
@@ -129,9 +126,7 @@ defmodule Api.UserEndpoint do
           true ->
             case Api.Service.Auth.revoke_token(service, %{:email => email}) do
               :ok ->
-                Publisher.publish(
-                  @routing_keys |> Map.get("user_logout"),
-                  %{:id => user.id, :name => user.email})
+                Publisher.publish(@routing_keys.user_logout, %{:id => user.id, :name => user.email})
                 conn
                 |> put_status(200)
                 |> assign(:jsonapi, %{"message" => "logged out: #{email}, token deleted"})
@@ -153,9 +148,7 @@ defmodule Api.UserEndpoint do
     end
   end
 
-# TODO: Mapping user to userview not working, privates should probably be in one map
-# -> Password hashes should not be returned!
-  post "/register", private: @skip_token_verification, private: %{view: UserView} do
+  post "/register", private: %{jwt_skip: true, view: UserView} do
     IO.puts("Registration request...")
     {:ok, service} = Api.Service.Auth.start_link
     {email, password, firstname, lastname, role, company} = {
@@ -227,9 +220,8 @@ defmodule Api.UserEndpoint do
         case %User{id: id, email: email, password: password, firstname: firstname, lastname: lastname, role: role} |> User.save do
           {:ok, created_entry} ->
             {:ok, company_employee} = %CompanyEmployee{company_name: company, user_id: id} |> CompanyEmployee.save
-            Publisher.publish(
-              @routing_keys |> Map.get("user_register"),
-              %{:id => id, :name => email})
+
+            Publisher.publish(@routing_keys.user_register, %{:id => id, :name => email})
 
             uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
             #not optimal
