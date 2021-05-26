@@ -1,0 +1,311 @@
+{
+	"info": {
+		"_postman_id": "7632d4b4-0126-497f-87fb-c217fc1e8789",
+		"name": "Jobportal-ms",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:4000/users/logout",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"variable_key\", \"variable_value\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsImV4cCI6MTYyMTY5ODcwMSwiaWF0IjoxNjIxNjk1MTAxLCJhdWQiOiJKb2tlbiIsImV4cCI6MTYyMTcwMjMwMSwiaWF0IjoxNjIxNjk1MTAxLCJpc3MiOiJKb2tlbiIsImp0aSI6IjJxMG1tNmhzOWVmczFycTk3YzAwMDA5MyIsIm5iZiI6MTYyMTY5NTEwMX0.7VGi3tZqmrtPSZ0xf35aWaxvxZ8iy-r6sLjbphALlzo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\": \"admin\",\r\n    \"email\": \"joe@ntt.data.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:4000/users/logout",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"users",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:4000/users/login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"token\", jsonData.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\": \"admin\",\r\n    \"email\": \"joe@ntt.data.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:4000/users/login",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"filter\": {\r\n        \"email\": \"joe4@ntt.data.com\"\r\n    }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:4000/users",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:4000/users/register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"joe5@ntt.data.com\",\r\n    \"password\": \"admin\",\r\n    \"firstname\": \"John2\",\r\n    \"lastname\": \"Doe2\",\r\n    \"role\": \"1\",\r\n    \"company\": \"NTT Data\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:4000/users/register",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user by ID",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvZUBudHQuZGF0YS5jb20iLCJleHAiOjE2MjE3NzEwNDcsImZpcnN0bmFtZSI6IkpvaG4iLCJpYXQiOjE2MjE3Njc0NDcsImxhc3RuYW1lIjoiRG9lIiwicm9sZSI6IjEiLCJhdWQiOiJKb2tlbiIsImV4cCI6MTYyMTc3NDY0NywiaWF0IjoxNjIxNzY3NDQ3LCJpc3MiOiJKb2tlbiIsImp0aSI6IjJxMHFwcGxkN2p1YzE5NmYzZzAwMDBnMiIsIm5iZiI6MTYyMTc2NzQ0N30.Ir1iBE78sJM6if-6vmyLqx-rx25VppCy82cvK9kXM6U",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/users/af711ff0-bb26-11eb-902a-708bcd51d01d",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"users",
+						"af711ff0-bb26-11eb-902a-708bcd51d01d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:4000/tokeninfo",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"jwt\":\"{{token}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:4000/tokeninfo",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"tokeninfo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:4000/users/request",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:4000/requests",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:4000/requests",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:4000/requests/",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"requests",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:4000/requests/",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:4000/requests/",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"requests",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}
