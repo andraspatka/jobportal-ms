@@ -153,8 +153,6 @@ defmodule Api.ApplicationEndpoint do
         |> put_status(200)
         |> assign(:jsonapi, [])
     end
-
-
   end
 
   get "/user/:id",

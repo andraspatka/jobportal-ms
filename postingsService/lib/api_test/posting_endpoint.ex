@@ -3,6 +3,7 @@ defmodule Api.PostingEndpoint do
 
   alias Api.Views.PostingView
   alias Api.Models.Posting
+  alias Api.Models.Applications
   alias Api.Plugs.JsonTestPlug
   alias Api.Service.Publisher
 
@@ -54,6 +55,12 @@ defmodule Api.PostingEndpoint do
   delete "/:id" do
     case Posting.delete(id) do
       {:ok, posting} ->
+        case Applications.findAll(%{posting_id: id}) do
+          {:ok, applications} ->
+            for application <- applications do
+              Applications.delete(application.id)
+            end
+        end
         Publisher.publish(
           @routing_keys
           |> Map.get("postings_delete"),
@@ -168,7 +175,7 @@ defmodule Api.PostingEndpoint do
       Map.get(conn.params, "name", nil),
       Map.get(conn.params, "description", nil),
       Map.get(conn.params, "categoryId", nil),
-      Map.get(conn.params, "requirements", nil),
+      Map.get(conn.params, "requirements", nil)
     }
 
     IO.puts(
