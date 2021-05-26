@@ -3,7 +3,7 @@ use Mix.Config
 config :user_management,
   db_host: "localhost",
   db_port: 27017,
-  db_db: "jobportal",
+  db_db: "users",
   db_tables: [
     "user",
     "company",
@@ -15,5 +15,20 @@ api_host: "localhost",
 api_port: 4000,
 api_scheme: "http",
 app_secret_key: "secret",
-jwt_validity: 3600
+jwt_validity: 3600,
+routing_keys: %{ # Todo: Refactor this to use atoms as keys
+  # User Events
+  "user_login" => "jobportal.user.login.events",
+  "user_logout" => "jobportal.user.logout.events",
+  "user_register" => "jobportal.user.register.events",
+},
 
+roles: %{
+  :employee => 0,
+  :employer => 1,
+  :admin => 2
+},
+
+event_url: "user:local-password@localhost", #username:passwd (here default)
+event_exchange: "logging",
+event_queue: "user_management"

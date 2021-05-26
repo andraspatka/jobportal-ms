@@ -1,6 +1,8 @@
 defmodule Api.Router do
   use Plug.Router
 
+  alias Api.Plugs.AuthPlug
+
   plug(:match)
 
   plug(Plug.Parsers,
@@ -9,6 +11,7 @@ defmodule Api.Router do
     json_decoder: Poison
   )
   plug(:dispatch)
+
 
   forward("/users", to: Api.UserEndpoint)
   forward("/tokeninfo", to: Api.JwtValidation)
