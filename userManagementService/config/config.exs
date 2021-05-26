@@ -18,9 +18,9 @@ app_secret_key: "secret",
 jwt_validity: 3600,
 routing_keys: %{ # Todo: Refactor this to use atoms as keys
   # User Events
-  "user_login" => "jobportal.user.login.events",
-  "user_logout" => "jobportal.user.logout.events",
-  "user_register" => "jobportal.user.register.events",
+  :user_login => "jobportal.user.login.events",
+  :user_logout => "jobportal.user.logout.events",
+  :user_register => "jobportal.user.register.events",
 },
 
 roles: %{
