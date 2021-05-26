@@ -18,6 +18,7 @@ defmodule Api.UserEndpoint do
   @roles Application.get_env(:user_management, :roles)
 
   plug :match
+  plug AuthPlug
   plug :dispatch
   plug JsonTestPlug
   plug :encode_response
@@ -153,9 +154,7 @@ defmodule Api.UserEndpoint do
     end
   end
 
-# TODO: Mapping user to userview not working, privates should probably be in one map
-# -> Password hashes should not be returned!
-  post "/register", private: @skip_token_verification, private: %{view: UserView} do
+  post "/register", private: %{jwt_skip: true, view: UserView} do
     IO.puts("Registration request...")
     {:ok, service} = Api.Service.Auth.start_link
     {email, password, firstname, lastname, role, company} = {
