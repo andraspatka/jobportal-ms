@@ -98,13 +98,15 @@ defmodule Endpoints.ApplicationEndpoint do
     end
 
     delete "/applications/:id" do
-        deleteUrl = "http://localhost:3000/applications"
-        params = %{id: id}
-        IO.inspect(params)
+      
+        {id} = {
+            Map.get(conn.path_params, "id", nil)
+        }
+        deleteUrl = "http://localhost:3000/applications/#{id}"
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.delete(deleteUrl, headers, params) do
+        case HTTPoison.delete(deleteUrl, headers) do
             {:ok, response} ->
                 conn
                 |> put_resp_content_type("application/json")
