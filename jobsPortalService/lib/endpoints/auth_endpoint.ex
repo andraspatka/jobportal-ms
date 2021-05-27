@@ -12,14 +12,13 @@ defmodule Endpoints.AuthEndpoint do
   # @mock_data [%{"id" => 1, "title" => "Hello"}, %{"id" => 2, "title" => "world!"}]
 
   post "/login"  do
-    IO.puts("LOGIN ....")
+   
     loginUrl =  'http://localhost:4000/users/login'
     { email, password } = {
       Map.get(conn.params, "email", nil),
       Map.get(conn.params, "password", nil)
     }
-    IO.puts("password: #{password}")
-    IO.puts("email: #{email}")
+   
     body = Poison.encode!(%Login{email: email, password: password})
     headers = [{"Content-type", "application/json"}]
     

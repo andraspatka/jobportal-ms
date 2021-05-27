@@ -15,7 +15,7 @@ defmodule Router do
     forward("/posting", to: Endpoints.PostingEndpoint)
     forward("/application", to: Endpoints.ApplicationEndpoint)
     forward("/category", to: Endpoints.CategoryEndpoint)
-
+    forward("/requests", to: Endpoints.RequestEndpoint)
   match _ do
     conn
     |> send_resp(404, Poison.encode!(%{message: "Not Found"}))
