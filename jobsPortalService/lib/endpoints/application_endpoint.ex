@@ -26,8 +26,8 @@ defmodule Endpoints.ApplicationEndpoint do
         applicationDate: applicationDate,
         applicantId: applicantId,
         postingId: postingId})
-
-        headers = [{"Content-type", "application/json"}]
+        auth = get_req_header(conn, "authorization")
+        headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
         case HTTPoison.post(applyUrl, body, headers, []) do
             {:ok, response} ->
@@ -52,8 +52,10 @@ defmodule Endpoints.ApplicationEndpoint do
         {id} = { Map.get(conn.path_params, "id", nil)}
         
         fetchUrl="http://localhost:3000/applications/user/#{id}"
+        auth = get_req_header(conn, "authorization")
+        headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.get(fetchUrl) do
+        case HTTPoison.get(fetchUrl,headers) do
             {:ok, response} ->
                 conn
                   |> put_resp_content_type("application/json")
@@ -76,8 +78,10 @@ defmodule Endpoints.ApplicationEndpoint do
             Map.get(conn.path_params, "postingId", nil)
         }
         fetchUrl="http://localhost:3000/applications/posting/#{id}"
+        auth = get_req_header(conn, "authorization")
+        headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.get(fetchUrl) do
+        case HTTPoison.get(fetchUrl, headers) do
             {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -97,7 +101,10 @@ defmodule Endpoints.ApplicationEndpoint do
         deleteUrl = "http://localhost:3000/applications"
         params = %{id: id}
         IO.inspect(params)
-        case HTTPoison.delete(deleteUrl, [], params) do
+        auth = get_req_header(conn, "authorization")
+        headers = [{"Authorization","#{auth}"}]
+
+        case HTTPoison.delete(deleteUrl, headers, params) do
             {:ok, response} ->
                 conn
                 |> put_resp_content_type("application/json")
