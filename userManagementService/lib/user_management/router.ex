@@ -5,7 +5,8 @@ defmodule Api.Router do
 
   plug(:match)
 
-  plug(Plug.Parsers,
+  plug(
+    Plug.Parsers,
     parsers: [:json],
     pass: ["application/json"],
     json_decoder: Poison
@@ -16,6 +17,7 @@ defmodule Api.Router do
   forward("/users", to: Api.UserEndpoint)
   forward("/tokeninfo", to: Api.JwtValidation)
   forward("/requests", to: Api.RequestEndpoint)
+  forward("/companies", to: Api.CompanyEndpoint)
 
   match _ do
     conn
