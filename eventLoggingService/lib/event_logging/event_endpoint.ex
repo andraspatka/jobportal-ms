@@ -4,12 +4,12 @@ defmodule Api.EventEndpoint do
   alias Api.Views.EventView
   alias Api.Models.Event
   alias Api.Plugs.JsonTestPlug
-  alias Api.Service.Publisher
+  alias Api.Service.Consumer
 
   @api_port Application.get_env(:events_management, :api_port)
   @api_host Application.get_env(:events_management, :api_host)
   @api_scheme Application.get_env(:events_management, :api_scheme)
-  @routing_keys Application.get_env(:events_management, :routing_keys)
+  @queue_events Application.get_env(:events_management, :event_users_queue)
   @token_verification 'http://localhost:4000/tokeninfo'
 
   plug :match
@@ -32,12 +32,25 @@ defmodule Api.EventEndpoint do
         view: EventView
       }
     do
-    IO.puts("Events called")
     {_, events} = Event.find_all(%{})
 
     conn
     |> put_status(200)
-    |> assign(:jsonapi, events)
+    |> assign(:jsonapi, [])
+  end
+
+  def consume_message do
+    IO.puts("Waiting for new events....")
+    Consumer.consume(@queue_events)
+    wait_for_messages()
+  end
+
+  def wait_for_messages do
+    receive do
+      {:basic_deliver, payload, _meta} ->
+        IO.puts "Received #{payload}"
+        wait_for_messages()
+    end
   end
 
 end

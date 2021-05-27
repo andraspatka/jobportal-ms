@@ -36,6 +36,5 @@ config :postings_management,
        },
 
        event_url: "guest:guest@localhost",
-         #username:passwd (here default)
        event_exchange: "logging",
-       event_queue: "postings_management"
+       event_queue: "user_management"

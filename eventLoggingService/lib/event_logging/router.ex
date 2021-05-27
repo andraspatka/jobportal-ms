@@ -3,7 +3,8 @@ defmodule Api.Router do
 
   plug(:match)
 
-  plug(Plug.Parsers,
+  plug(
+    Plug.Parsers,
     parsers: [:json],
     pass: ["application/json"],
     json_decoder: Poison
@@ -13,7 +14,6 @@ defmodule Api.Router do
   forward("/events", to: Api.EventEndpoint)
 
   match _ do
-    IO.puts("ERROR")
     conn
     |> send_resp(404, Poison.encode!(%{message: "Not Found"}))
   end

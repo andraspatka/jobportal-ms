@@ -14,7 +14,7 @@ defmodule EventsManagement.Application do
       # {ApiTest.Worker, arg}
       {Plug.Cowboy, scheme: :http, plug: Api.Router, options: [port: api_port]},
       {Mongo, [name: :mongo, database: db, pool_size: 2]},
-      {Api.Service.Publisher, app_id: :events_management},
+      {Api.Service.Consumer, app_id: :events_management},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -22,7 +22,8 @@ defmodule EventsManagement.Application do
     opts = [strategy: :one_for_one, name: EventsManagement.Supervisor]
     Supervisor.start_link(children, opts)
 
-    #    Api.Service.Publisher.start_link()
+    Api.EventEndpoint.consume_message()
+
   end
 
   defp api_port, do: Application.get_env(:events_management, :api_port)
