@@ -29,6 +29,6 @@ roles: %{
   :admin => 2
 },
 
-event_url: "user:local-password@localhost", #username:passwd (here default)
+event_url: "guest:guest@localhost", #username:passwd (here default)
 event_exchange: "logging",
 event_queue: "user_management"
