@@ -6,8 +6,11 @@ defmodule Api.Models.Company do
 
   use Api.Models.Base
   defstruct [
+    :id,
     :name,
-    :admin
+    :admin,
+    :created_at,
+    :updated_at
   ]
 
 end
