@@ -69,11 +69,36 @@ defmodule Endpoints.AuthEndpoint do
   end
 
   get "/companies" do
-    companiesUrl = 'http://localhost:4000/users/companies'
-    body = ""
+    companiesUrl = 'http://localhost:4000/companies'
+   
+    case HTTPoison.get(companiesUrl) do
+      {:ok, response} ->
+        conn
+          |> put_resp_content_type("application/json")
+          |> send_resp(200, response.body)
+      {:not_found, response} ->
+        conn
+          |> put_resp_content_type("application/json")
+          |> send_resp(404, response.body)
+      {:error, response} ->
+        conn
+          |> put_resp_content_type("application/json")
+          |> send_resp(500, response.body)
+    end
+  end
+
+  post "/companies" do
+
+    companiesUrl = 'http://localhost:4000/companies'
+
+    {name, admin} =  {
+      Map.get(conn.params, "name", nil),
+      Map.get(conn.params, "admin", nil)
+    }
+    body = Poison.encode!(%Company{name: name, admin: admin})
     headers = [{"Content-type", "application/json"}]
 
-    case HTTPoison.get(companiesUrl) do
+    case HTTPoison.post(companiesUrl, body, headers) do
       {:ok, response} ->
         conn
           |> put_resp_content_type("application/json")
