@@ -1,0 +1,7 @@
+apiVersion: skaffold/v2beta15
+kind: Config
+requires:
+  - configs: ["infra"]
+    path: infra/skaffold.yaml
+build: {}
+deploy: {}

@@ -1,0 +1,8 @@
+apiVersion: v2
+name: user-management-service
+version: 1.0.0
+description: A Helm chart to build and deploy an app which serves as user management for the jobportal application
+keywords:
+  - runtimes
+  - elixir
+  - amqp
