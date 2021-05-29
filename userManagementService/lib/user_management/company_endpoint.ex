@@ -32,7 +32,13 @@ defmodule Api.CompanyEndpoint do
         view: CompanyView
       }  do
     {_, companies} = Company.find_all(%{})
-    IO.inspect(companies)
+    Publisher.publish(
+      @routing_keys.companies_get_all,
+      %{
+        :type => "COMPANIES_GET",
+        :details => "All companies from the JobPortal were requested."
+      }
+    )
 
     conn
     |> put_status(200)
@@ -41,9 +47,6 @@ defmodule Api.CompanyEndpoint do
 
 
   post "/" do
-    
-  
-         
     {name, admin} = {
       Map.get(conn.params, "name", nil),
       Map.get(conn.params, "admin", nil)
@@ -51,40 +54,42 @@ defmodule Api.CompanyEndpoint do
 
     IO.puts("New company request: #{name}")
 
-      cond do
-        is_nil(name) ->
-          conn
-          |> put_status(400)
-          |> assign(:jsonapi, %{error: "Name must be present!"})
-        is_nil(admin) ->
-          conn
-          |> put_status(400)
-          |> assign(:jsonapi, %{error: "Admin id must be present!"})
-        true ->
-          id = UUID.uuid1()
-          case %Company{
-                  id: id,
-                  name: name,
-                  admin: admin,
-                  created_at: nil,
-                  updated_at: nil
-                }
-                |> Company.save do
-            {:ok, created_entry} ->
-              Publisher.publish(
-                @routing_keys
-                |> Map.get("category_added"),
-                %{:id => id, :name => name}
-              )
-              conn
-              |> put_status(201)
-              |> assign(:jsonapi, created_entry)
+    cond do
+      is_nil(name) ->
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{error: "Name must be present!"})
+      is_nil(admin) ->
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{error: "Admin id must be present!"})
+      true ->
+        id = UUID.uuid1()
+        case %Company{
+               id: id,
+               name: name,
+               admin: admin,
+               created_at: nil,
+               updated_at: nil
+             }
+             |> Company.save do
+          {:ok, created_entry} ->
+            Publisher.publish(
+              @routing_keys.company_added,
+              %{
+                :type => "COMPANY_ADDED",
+                :details => "Company with name #{created_entry.name} was added in the JobPortal."
+              }
+            )
+            conn
+            |> put_status(201)
+            |> assign(:jsonapi, created_entry)
 
-            :error ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{body: "An unexpected error happened"})
-          end
-      end                         
+          :error ->
+            conn
+            |> put_status(500)
+            |> assign(:jsonapi, %{body: "An unexpected error happened"})
+        end
+    end
   end
 end
