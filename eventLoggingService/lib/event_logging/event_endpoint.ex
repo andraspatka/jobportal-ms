@@ -39,6 +39,18 @@ defmodule Api.EventEndpoint do
     |> assign(:jsonapi, events)
   end
 
+  get "/:type",
+      private: %{
+        view: EventView
+      }
+    do
+    {_, events} = Event.find_all(%{type: type})
+
+    conn
+    |> put_status(200)
+    |> assign(:jsonapi, events)
+  end
+
   def consume_message do
     IO.puts("Waiting for new events....")
     Consumer.consume(@queue_events)
