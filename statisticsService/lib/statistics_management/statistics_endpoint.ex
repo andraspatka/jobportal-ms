@@ -28,7 +28,7 @@ defmodule StatisticsManagement.StatisticsEnpoint do
           end
     end
 
-    get "/type" do
+    get "/:type" do
 
       auth = get_req_header(conn, "Authorization")
       headers = [{"Authorization","#{auth}"}]
