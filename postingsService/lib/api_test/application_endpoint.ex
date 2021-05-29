@@ -43,7 +43,10 @@ defmodule Api.ApplicationEndpoint do
                     Publisher.publish(
                       @routing_keys
                       |> Map.get("applications_delete"),
-                      %{:id => id, :name => "User deleted."}
+                      %{
+                        :type => "APPLICATION_DELETED",
+                        :details => "Application with the id #{application.id} was deleted."
+                      }
                     )
                     conn
                     |> put_status(200)
@@ -135,7 +138,10 @@ defmodule Api.ApplicationEndpoint do
                         Publisher.publish(
                           @routing_keys
                           |> Map.get("applications_add"),
-                          %{:id => id, :name => created_entry.user_id}
+                          %{
+                            :type => "APPLICATION_ADDED",
+                            :details => "A new application with the id #{created_entry.id} was added."
+                          }
                         )
                         conn
                         |> put_status(201)
@@ -175,7 +181,10 @@ defmodule Api.ApplicationEndpoint do
                     Publisher.publish(
                       @routing_keys
                       |> Map.get("applications_get_for_posting"),
-                      %{:id => id, :name => "Get all applications for posting."}
+                      %{
+                        :type => "APPLICATIONS_OF_POSTING",
+                        :details => "All the applications of the posting with the id #{id} were requested."
+                      }
                     )
                     conn
                     |> put_status(200)
@@ -214,7 +223,10 @@ defmodule Api.ApplicationEndpoint do
                     Publisher.publish(
                       @routing_keys
                       |> Map.get("applications_get_for_user"),
-                      %{:id => id, :name => "Get all applications for user."}
+                      %{
+                        :type => "APPLICATIONS_OF_USER",
+                        :details => "All the applications of the user with the id #{id} were requested."
+                      }
                     )
                     conn
                     |> put_status(200)
@@ -254,7 +266,10 @@ defmodule Api.ApplicationEndpoint do
                     Publisher.publish(
                       @routing_keys
                       |> Map.get("applications_find_all"),
-                      %{:id => "Applications", :name => "Find all applications."}
+                      %{
+                        :type => "APPLICATIONS_FIND_ALL",
+                        :details => "All the applications of the JobPortal were requested."
+                      }
                     )
                     conn
                     |> put_status(200)
