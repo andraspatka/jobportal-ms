@@ -1,4 +1,4 @@
-defmodule Jobsportalservice do
+defmodule PortalManagement do
   @moduledoc """
   Documentation for `Jobsportalservice`.
   """

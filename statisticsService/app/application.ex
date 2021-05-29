@@ -21,5 +21,5 @@ defmodule App.Application do
   end
 
   # Call environment variables here.
-  defp port, do: Application.get_env(:app, :port, 8000)
+  defp port, do: Application.get_env(:app, :port, 9000)
 end

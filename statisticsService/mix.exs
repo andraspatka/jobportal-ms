@@ -1,9 +1,9 @@
-defmodule PortalManagement.MixProject do
+defmodule Statistics.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :portal_management,
+      app: :statistics,
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule PortalManagement.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {PortalManagement.Application, []}
+      mod: {App.Application, []}
     ]
   end
 
@@ -25,8 +25,7 @@ defmodule PortalManagement.MixProject do
       {:poison, "~> 3.1"},
       {:cowboy, "~> 2.6"},
       {:plug_cowboy, "~> 2.0"},
-      {:httpoison, "~> 1.8"},
-      {:cors_plug, "~> 2.0"}
+      {:httpoison, "~> 1.8"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]

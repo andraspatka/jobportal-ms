@@ -3,16 +3,20 @@ defmodule Endpoints.PostingEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Postings
-    plug CORSPlug, origin: ["http://localhost:4200"]
+
+    @posting Application.get_env(:portal_management, :posting)
+    @origin Application.get_env(:portal_management, :origin)
+
     plug(:match)
     plug(:dispatch)
+    plug CORSPlug, origin: ["http://localhost:4200"]
 
     get "/postings" do
-        getPostingUrl = "http://localhost:3000/postings"
+
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.get(getPostingUrl, headers) do
+        case HTTPoison.get(@posting, headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -36,10 +40,10 @@ defmodule Endpoints.PostingEndpoint do
         {id} = {
           Map.get(conn.path_params, "id", nil)
         }
-        
-        deleteUrl = "http://localhost:3000/postings/#{id}"
 
-        case HTTPoison.delete(deleteUrl, headers,[]) do
+        url = "#{@posting}" <> "#{id}"
+
+        case HTTPoison.delete(url, headers,[]) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -56,8 +60,6 @@ defmodule Endpoints.PostingEndpoint do
     end
 
     post "/postings" do
-
-        addUrl = "http://localhost:3000/postings"
 
         {postedById, postedAt, deadline, numberOfViews, name, description, 
         categoryId, requirements}  = {
@@ -83,7 +85,7 @@ defmodule Endpoints.PostingEndpoint do
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
 
-        case HTTPoison.post(addUrl, body, headers, []) do
+        case HTTPoison.post(@posting, body, headers, []) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -101,7 +103,6 @@ defmodule Endpoints.PostingEndpoint do
 
 
     patch "/postings" do
-        updateUrl="http://localhost:3000/postings"
 
         {id, deadline, name, description, requirements} = {
           Map.get(conn.params, "id", nil),
@@ -117,7 +118,7 @@ defmodule Endpoints.PostingEndpoint do
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
 
-        case HTTPoison.patch(updateUrl, body, headers, []) do
+        case HTTPoison.patch(@posting, body, headers, []) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
