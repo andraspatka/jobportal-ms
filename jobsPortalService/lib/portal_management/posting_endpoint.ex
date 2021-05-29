@@ -3,19 +3,20 @@ defmodule Endpoints.PostingEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Postings
+    alias Services.Url
 
     @endpoint_url Application.get_env(:portal_management, :endpoint_url)
-
+    @origin Application.get_env(:portal_management, :origin)
     plug(:match)
     plug(:dispatch)
-    plug CORSPlug, origin: @endpoint_url.origin
+    plug CORSPlug, origin: @origin
 
     get "/postings" do
 
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
-
-        case HTTPoison.get(@endpoint_url.posting, headers) do
+        url = Url.posting_endp(@endpoint_url.posting_posting)
+        case HTTPoison.get(url, headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -40,7 +41,7 @@ defmodule Endpoints.PostingEndpoint do
           Map.get(conn.path_params, "id", nil)
         }
 
-        url = @endpoint_url.posting <> "/#{id}"
+        url = Url.posting_endp(@endpoint_url.posting_posting) <> "/#{id}"
 
         case HTTPoison.delete(url, headers,[]) do
           {:ok, response} ->
@@ -82,9 +83,9 @@ defmodule Endpoints.PostingEndpoint do
 
         auth = get_req_header(conn, "authorization")
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
+        url = Url.posting_endp(@endpoint_url.posting_posting)
 
-
-        case HTTPoison.post(@endpoint_url.posting, body, headers, []) do
+        case HTTPoison.post(url, body, headers, []) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -115,9 +116,9 @@ defmodule Endpoints.PostingEndpoint do
         requirements: requirements})
         auth = get_req_header(conn, "authorization")
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
+        url = Url.posting_endp(@endpoint_url.posting_posting)
 
-
-        case HTTPoison.patch(@endpoint_url.posting, body, headers, []) do
+        case HTTPoison.patch(url, body, headers, []) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")

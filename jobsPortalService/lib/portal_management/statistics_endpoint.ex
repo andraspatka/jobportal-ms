@@ -1,20 +1,22 @@
 defmodule Endpoints.StatisticsEndpoint do
     import Plug.Conn
     use Plug.Router
+    alias Services.Url
 
 
     @endpoint_url Application.get_env(:portal_management, :endpoint_url)
+    @origin Application.get_env(:portal_management, :origin)
 
     plug(:match)
     plug(:dispatch)
-    plug CORSPlug, origin: @endpoint_url.origin
+    plug CORSPlug, origin: @origin
 
 
     get "/" do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
-
-        case HTTPoison.get(@endpoint_url.statistics, headers) do
+        url = Url.stat_endp(@endpoint_url.statistics)
+        case HTTPoison.get(url, headers) do
             {:ok, response} ->
                 conn
                 |> put_resp_content_type("application/json")
@@ -36,8 +38,8 @@ defmodule Endpoints.StatisticsEndpoint do
       auth = get_req_header(conn, "Authorization")
       headers = [{"Authorization","#{auth}"}]
       {type} = { Map.get(conn.path_params, "type", nil) }
-
-      case HTTPoison.get(@endpoint_url.statistics <> "/#{type}", headers) do
+      url = Url.stat_endp(@endpoint_url.statistics)
+      case HTTPoison.get(url <> "/#{type}", headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")

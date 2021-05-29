@@ -1,27 +1,20 @@
 import Config
 
-#import_config "#{Mix.env()}.exs"
-
 config :portal_management,
     api_host: "localhost",
     api_port: 8000,
     api_scheme: "http",
+    user_management_service_url: "http://localhost:4000",
+    posting_management_service_url: "http://localhost:3000",
+    statistics_service_url: "http://localhost:9000",
     endpoint_url: %{
-        :login => "http://localhost:4000/users/login",
-        :register => "http://localhost:4000/users/register",
-        :companies => "http://localhost:4000/companies",
-        :applications => "http://localhost:3000/applications",
-        :categories => "http://localhost:3000/categories",
-        :posting => "http://localhost:3000/postings",
-        :request => "http://localhost:4000/requests",
-        :statistics => "http://localhost:9000/statistics",
-        :origin => "http://localhost:4200"
-    }
-    # origin: "http://localhost:4200",
-    # login: "http://localhost:4000/users/login/",
-    # register: "http://localhost:4000/users/register/",
-    # companies: ["http://localhost:4000/companies/"],
-    # applications: "http://localhost:3000/applications/",
-    # categories: "http://localhost:3000/categories/",
-    # posting: "http://localhost:3000/postings/",
-    # request: "http://localhost:4000/requests"
+        :user_login => "/users/login",
+        :user_register => "/users/register",
+        :user_companies => "/companies",
+        :user_request => "/requests",
+        :posting_applications => "/applications",
+        :posting_categories => "/categories",
+        :posting_posting => "/postings",
+        :statistics => "/statistics",
+    },
+    origin: ["http://localhost:4200"]
