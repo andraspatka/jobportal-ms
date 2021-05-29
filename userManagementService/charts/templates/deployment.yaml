@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: user-management-service
+  name: user-management-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-management-service
+  template:
+    metadata:
+      labels:
+        app: user-management-service
+    spec:
+      containers:
+        - name: user-management-service
+          image: jps/user-management-service:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+          env:
+  {{- toYaml .Values.env | nindent 12 }}

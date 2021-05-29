@@ -8,10 +8,9 @@ USER = "user"
 PASSWORD = "local-password"
 HOST = "localhost"
 
-USER_MANAGEMENT_QUEUE = "user_management"
+QUEUE = "user_management"
 USER_MANAGEMENT_ROUTING_KEY = "jobportal.user.*.events"
 
-POSTINGS_MANAGEMENT_QUEUE = "postings_management"
 POSTINGS_MANAGEMENT_ROUTING_KEY = "jobportal.postings.*.events"
 LOGGING_EXCHANGE = "logging"
 
@@ -23,10 +22,9 @@ connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
 channel.exchange_declare(exchange=LOGGING_EXCHANGE, exchange_type='topic', durable=True)
-channel.queue_declare(queue=USER_MANAGEMENT_QUEUE, exclusive=False, durable=True)
-channel.queue_bind(USER_MANAGEMENT_QUEUE, LOGGING_EXCHANGE, routing_key=USER_MANAGEMENT_ROUTING_KEY)
+channel.queue_declare(queue=QUEUE, exclusive=False, durable=True)
 
-channel.queue_declare(queue=POSTINGS_MANAGEMENT_QUEUE, exclusive=False, durable=True)
-channel.queue_bind(POSTINGS_MANAGEMENT_QUEUE, LOGGING_EXCHANGE, routing_key=POSTINGS_MANAGEMENT_ROUTING_KEY)
+channel.queue_bind(QUEUE, LOGGING_EXCHANGE, routing_key=USER_MANAGEMENT_ROUTING_KEY)
+channel.queue_bind(QUEUE, LOGGING_EXCHANGE, routing_key=POSTINGS_MANAGEMENT_ROUTING_KEY)
 
 connection.close()

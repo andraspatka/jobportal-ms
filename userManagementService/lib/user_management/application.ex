@@ -13,7 +13,7 @@ defmodule UserManagement.Application do
       # Starts a worker by calling: UserManagement.Worker.start_link(arg)
       # {UserManagement.Worker, arg}
       {Plug.Cowboy, scheme: :http, plug: Api.Router, options: [port: api_port]},
-      {Mongo, [name: :mongo, database: db, pool_size: 2]},
+      {Mongo, [name: :mongo, database: db, pool_size: 2, hostname: db_host]},
       {Api.Service.Publisher, app_id: :user_management},
     ]
 
@@ -27,4 +27,7 @@ defmodule UserManagement.Application do
 
   defp api_port, do: Application.get_env(:user_management, :api_port)
   defp db, do: Application.get_env(:user_management, :db_db)
+  defp db_user, do: Application.get_env(:user_management, :db_user)
+  defp db_password, do: Application.get_env(:user_management, :db_password)
+  defp db_host, do: Application.get_env(:user_management, :db_host)
 end

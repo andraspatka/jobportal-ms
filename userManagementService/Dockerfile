@@ -1,11 +1,28 @@
-FROM elixir:1.11.4-alpine
+FROM elixir:1.12.0-rc.1-alpine as builder
 
-WORKDIR src
+RUN mix local.rebar --force && \
+    mix local.hex --force
+WORKDIR /app
+ENV MIX_ENV=prod
 
-ADD .. .
+FROM builder as deps
+COPY mix.* /app/
+RUN mix do deps.get --only prod, deps.compile
 
-RUN mix local.hex --force
+FROM deps as releaser
+COPY . /app/
+RUN mix do release
+RUN pwd
+RUN ls
 
-RUN mix do deps.get deps.compile compile
+# ---- Application Stage ----
+FROM alpine:3
+RUN apk add --no-cache --update busybox-extras bash openssl curl
 
-ENTRYPOINT mix run --no-halt
+WORKDIR app
+
+RUN pwd
+RUN ls
+COPY --from=releaser /app/_build .
+
+CMD ["/app/prod/rel/user_management/bin/user_management", "start"]
