@@ -36,7 +36,7 @@ defmodule Api.EventEndpoint do
 
     conn
     |> put_status(200)
-    |> assign(:jsonapi, [])
+    |> assign(:jsonapi, events)
   end
 
   def consume_message do
@@ -48,7 +48,13 @@ defmodule Api.EventEndpoint do
   def wait_for_messages do
     receive do
       {:basic_deliver, payload, _meta} ->
+        response = Poison.decode!(payload)
         IO.puts "Received #{payload}"
+        type = response |> Map.get("type")
+        details = response |> Map.get("details")
+        id = UUID.uuid1()
+        %Event{id: id, type: type, details: details, created_at: nil, updated_at: nil}
+        |> Event.save
         wait_for_messages()
     end
   end

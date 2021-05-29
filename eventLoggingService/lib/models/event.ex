@@ -7,8 +7,9 @@ defmodule Api.Models.Event do
   use Api.Models.Base
   defstruct [
     :id,
-    :name,
-    :date,
+    :type,
+    :details,
+    :created_at,
     :updated_at
   ]
 
