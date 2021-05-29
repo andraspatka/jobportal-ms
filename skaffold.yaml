@@ -5,7 +5,7 @@ requires:
     path: infra/skaffold.yaml
   - configs: ["user-management-service"]
     path: userManagementService/skaffold.yaml
-  - configs: ["events-management-service"]
+  - configs: ["event-management-service"]
     path: eventLoggingService/skaffold.yaml
 build: {}
 deploy: {}
