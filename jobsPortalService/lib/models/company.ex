@@ -1,3 +1,3 @@
 defmodule Models.Company do
-    defstruct name: nil
+    defstruct name: nil, admin: nil
 end

@@ -3,13 +3,16 @@ defmodule Endpoints.PostingEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Postings
-
+    plug CORSPlug, origin: ["http://localhost:4200"]
     plug(:match)
     plug(:dispatch)
 
     get "/postings" do
         getPostingUrl = "http://localhost:3000/postings"
-        case HTTPoison.get(getPostingUrl) do
+        auth = get_req_header(conn, "authorization")
+        headers = [{"Authorization","#{auth}"}]
+
+        case HTTPoison.get(getPostingUrl, headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -27,7 +30,9 @@ defmodule Endpoints.PostingEndpoint do
 
     delete "/postings/:id" do
         
-        headers = []
+      auth = get_req_header(conn, "authorization")
+      headers = [{"Authorization","#{auth}"}]
+
         {id} = {
           Map.get(conn.path_params, "id", nil)
         }
@@ -74,7 +79,9 @@ defmodule Endpoints.PostingEndpoint do
         categoryId: categoryId,
         requirements: requirements})
 
-        headers = [{"Content-type", "application/json"}]
+        auth = get_req_header(conn, "authorization")
+        headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
+
 
         case HTTPoison.post(addUrl, body, headers, []) do
           {:ok, response} ->
@@ -106,7 +113,8 @@ defmodule Endpoints.PostingEndpoint do
 
         body = Poison.encode!(%Postings{id: id,  deadline: deadline, name: name, description: description, 
         requirements: requirements})
-        headers = [{"Content-type", "application/json"}]
+        auth = get_req_header(conn, "authorization")
+        headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
 
         case HTTPoison.patch(updateUrl, body, headers, []) do
