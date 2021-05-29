@@ -103,4 +103,21 @@ db.company_employee.insert({company_name: "msg", user_id: "af711ff0-bb26-11eb-90
 
 # Skaffold
 
-TODO
+requirements:
+- skaffold
+- helm
+- kubernetes cluster
+- docker-desktop
+
+```bash
+# Deploy rabbitmq and mongodb. Mongodb has an initDbScript which inserts some test data (two companies and two users)
+skaffold run -m infra
+
+# Run script for setting up rabbitmq (create exchange, queue, bindings)
+infra/createExchangeQueues.py
+
+skaffold run -m user-management
+
+skaffold run -m events-management
+
+```

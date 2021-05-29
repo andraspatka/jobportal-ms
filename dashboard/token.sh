@@ -3,3 +3,4 @@ token=$(kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashb
 
 echo ${token} | clip.exe
 
+start http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/overview?namespace=default

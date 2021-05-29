@@ -13,7 +13,7 @@ defmodule EventsManagement.Application do
       # Starts a worker by calling: ApiTest.Worker.start_link(arg)
       # {ApiTest.Worker, arg}
       {Plug.Cowboy, scheme: :http, plug: Api.Router, options: [port: api_port]},
-      {Mongo, [name: :mongo, database: db, pool_size: 2]},
+      {Mongo, [name: :mongo, database: db, pool_size: 2, hostname: db_host]},
       {Api.Service.Consumer, app_id: :events_management},
     ]
 
@@ -28,4 +28,5 @@ defmodule EventsManagement.Application do
 
   defp api_port, do: Application.get_env(:events_management, :api_port)
   defp db, do: Application.get_env(:events_management, :db_db)
+  defp db_host, do: Application.get_env(:events_management, :db_host)
 end

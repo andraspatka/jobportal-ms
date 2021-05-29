@@ -27,7 +27,5 @@ defmodule UserManagement.Application do
 
   defp api_port, do: Application.get_env(:user_management, :api_port)
   defp db, do: Application.get_env(:user_management, :db_db)
-  defp db_user, do: Application.get_env(:user_management, :db_user)
-  defp db_password, do: Application.get_env(:user_management, :db_password)
   defp db_host, do: Application.get_env(:user_management, :db_host)
 end
