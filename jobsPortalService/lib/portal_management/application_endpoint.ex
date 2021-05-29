@@ -7,7 +7,7 @@ defmodule Endpoints.ApplicationEndpoint do
     @endpoint_url Application.get_env(:portal_management, :endpoint_url)
     plug(:match)
     plug(:dispatch)
-    plug CORSPlug, origin: ["http://localhost:4200"]
+    plug CORSPlug, origin: @endpoint_url.origin
 
     #apply to posting
     post "/applications" do

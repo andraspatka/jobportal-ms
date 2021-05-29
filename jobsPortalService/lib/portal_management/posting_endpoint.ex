@@ -8,7 +8,7 @@ defmodule Endpoints.PostingEndpoint do
 
     plug(:match)
     plug(:dispatch)
-    plug CORSPlug, origin: ["http://localhost:4200"]
+    plug CORSPlug, origin: @endpoint_url.origin
 
     get "/postings" do
 

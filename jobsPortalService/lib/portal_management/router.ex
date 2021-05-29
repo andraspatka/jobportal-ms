@@ -16,7 +16,7 @@ defmodule Api.Router do
   forward("/application", to: Endpoints.ApplicationEndpoint)
   forward("/category", to: Endpoints.CategoryEndpoint)
   forward("/requests", to: Endpoints.RequestEndpoint)
-  forward("/statistics", to: Endpoints.StatisticsEnpoint)
+  forward("/statistics", to: Endpoints.StatisticsEndpoint)
   
   match _ do
     conn
