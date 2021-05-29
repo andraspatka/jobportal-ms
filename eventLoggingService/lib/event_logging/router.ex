@@ -1,8 +1,6 @@
 defmodule Api.Router do
   use Plug.Router
 
-  alias Api.Plugs.AuthPlug
-
   plug(:match)
 
   plug(
@@ -13,11 +11,7 @@ defmodule Api.Router do
   )
   plug(:dispatch)
 
-
-  forward("/users", to: Api.UserEndpoint)
-  forward("/tokeninfo", to: Api.JwtValidation)
-  forward("/requests", to: Api.RequestEndpoint)
-  forward("/companies", to: Api.CompanyEndpoint)
+  forward("/events", to: Api.EventEndpoint)
 
   match _ do
     conn

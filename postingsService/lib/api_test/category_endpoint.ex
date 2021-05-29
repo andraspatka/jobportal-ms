@@ -47,7 +47,10 @@ defmodule Api.CategoryEndpoint do
                     Publisher.publish(
                       @routing_keys
                       |> Map.get("categories_find_all"),
-                      %{:id => "Categories", :name => "Find all categories."}
+                      %{
+                        :type => "CATEGORIES_FIND_ALL",
+                        :details => "All the existing categories in the JobPortal were requested."
+                      }
                     )
                     conn
                     |> put_status(200)
@@ -103,7 +106,10 @@ defmodule Api.CategoryEndpoint do
                         Publisher.publish(
                           @routing_keys
                           |> Map.get("category_added"),
-                          %{:id => id, :name => name}
+                          %{
+                            :type => "CATEGORY_ADDED",
+                            :details => "A new category with the name #{created_entry.name} was added in the JobPortal."
+                          }
                         )
                         conn
                         |> put_status(201)

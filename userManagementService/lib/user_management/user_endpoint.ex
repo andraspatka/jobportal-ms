@@ -25,7 +25,12 @@ defmodule Api.UserEndpoint do
 
   defp encode_response(conn, _) do
     conn
-    |>send_resp(conn.status, conn.assigns |> Map.get(:jsonapi, %{}) |> Poison.encode!)
+    |> send_resp(
+         conn.status,
+         conn.assigns
+         |> Map.get(:jsonapi, %{})
+         |> Poison.encode!
+       )
   end
 
   defp is_password_correct(password_hash, password) do
@@ -33,17 +38,36 @@ defmodule Api.UserEndpoint do
     Api.Service.Auth.verify_hash(service, {password, password_hash})
   end
 
-  get "/", private: %{view: UserView}  do
-    {_, users} =  User.find_all(%{})
-
+  get "/",
+      private: %{
+        view: UserView
+      }  do
+    {_, users} = User.find_all(%{})
+    Publisher.publish(
+      @routing_keys.user_find_all,
+      %{
+        :type => "USER_FIND_ALL",
+        :details => "All users from the JobPortal were requested."
+      }
+    )
     conn
     |> put_status(200)
     |> assign(:jsonapi, users)
   end
 
-  get "/:id", private: %{view: UserView}  do
+  get "/:id",
+      private: %{
+        view: UserView
+      }  do
     case User.get(id) do
       {:ok, user} ->
+        Publisher.publish(
+          @routing_keys.user_find_id,
+          %{
+            :type => "USER_FIND_ID",
+            :details => "User with id #{user.id} was searched in the JobPortal."
+          }
+        )
 
         conn
         |> put_status(200)
@@ -61,7 +85,6 @@ defmodule Api.UserEndpoint do
       Map.get(conn.params, "email", nil),
       Map.get(conn.params, "password", nil),
     }
-    IO.puts("password: #{password}")
     IO.puts("email: #{email}")
 
     cond do
@@ -85,18 +108,32 @@ defmodule Api.UserEndpoint do
                 |> put_status(403)
                 |> assign(:jsonapi, %{error: "password invalid!"})
 
-            true ->
-              {:ok, service} = Api.Service.Auth.start_link
-              token = Api.Service.Auth.issue_token(service,
-                %{:uuid => user.id, :email => email, :role => user.role, :firstname => user.firstname, :lastname => user.lastname})
-              Publisher.publish(@routing_keys.user_login, %{:id => user.id, :name => user.email})
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi, %{:token => token})
-            :error ->
-              conn
-              |> put_status(500)
-              |> assign(:jsonapi, %{"error" => "An unexpected error happened"})
+              true ->
+                {:ok, service} = Api.Service.Auth.start_link
+                token = Api.Service.Auth.issue_token(
+                  service,
+                  %{
+                    :uuid => user.id,
+                    :email => email,
+                    :role => user.role,
+                    :firstname => user.firstname,
+                    :lastname => user.lastname
+                  }
+                )
+                Publisher.publish(
+                  @routing_keys.user_login,
+                  %{
+                    :type => "USER_LOGGED_IN",
+                    :details => "User with email #{user.email} and name #{user.firstname} #{user.lastname} logged in."
+                  }
+                )
+                conn
+                |> put_status(200)
+                |> assign(:jsonapi, %{:token => token})
+              :error ->
+                conn
+                |> put_status(500)
+                |> assign(:jsonapi, %{"error" => "An unexpected error happened"})
             end
           :error ->
             conn
@@ -126,7 +163,13 @@ defmodule Api.UserEndpoint do
           true ->
             case Api.Service.Auth.revoke_token(service, %{:email => email}) do
               :ok ->
-                Publisher.publish(@routing_keys.user_logout, %{:id => user.id, :name => user.email})
+                Publisher.publish(
+                  @routing_keys.user_logout,
+                  %{
+                    :type => "USER_LOGGED_OUT",
+                    :details => "User with email #{user.email} and name #{user.firstname} #{user.lastname} logged out."
+                  }
+                )
                 conn
                 |> put_status(200)
                 |> assign(:jsonapi, %{"message" => "logged out: #{email}, token deleted"})
@@ -148,7 +191,11 @@ defmodule Api.UserEndpoint do
     end
   end
 
-  post "/register", private: %{jwt_skip: true, view: UserView} do
+  post "/register",
+       private: %{
+         jwt_skip: true,
+         view: UserView
+       } do
     IO.puts("Registration request...")
     {:ok, service} = Api.Service.Auth.start_link
     {email, password, firstname, lastname, role, company} = {
@@ -217,14 +264,21 @@ defmodule Api.UserEndpoint do
 
 
       true ->
-        case %User{id: id, email: email, password: password, firstname: firstname, lastname: lastname, role: role} |> User.save do
+        case %User{id: id, email: email, password: password, firstname: firstname, lastname: lastname, role: role}
+             |> User.save do
           {:ok, created_entry} ->
-            {:ok, company_employee} = %CompanyEmployee{company_name: company, user_id: id} |> CompanyEmployee.save
-
-            Publisher.publish(@routing_keys.user_register, %{:id => id, :name => email})
-
+            {:ok, company_employee} = %CompanyEmployee{company_name: company, user_id: id}
+                                      |> CompanyEmployee.save
+            Publisher.publish(
+              @routing_keys.user_register,
+              %{
+                :type => "USER_REGISTERED",
+                :details => "User with email #{created_entry.email} and name #{created_entry.firstname} #{
+                  created_entry.lastname
+                } registered in the JobPortal."
+              }
+            )
             uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
-            #not optimal
 
             conn
             |> put_resp_header("location", "#{uri}#{id}")
