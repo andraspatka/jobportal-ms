@@ -48,7 +48,10 @@ defmodule Api.PostingEndpoint do
                     Publisher.publish(
                       @routing_keys
                       |> Map.get("postings_find_all"),
-                      %{:id => "Postings", :name => "Find all postings."}
+                      %{
+                        :type => "POSTINGS_FIND_ALL",
+                        :details => "All the postings from the JobPortal were requested."
+                      }
                     )
                     conn
                     |> put_status(200)
@@ -90,7 +93,10 @@ defmodule Api.PostingEndpoint do
                     Publisher.publish(
                       @routing_keys
                       |> Map.get("postings_delete"),
-                      %{:id => id, :name => "Posting deleted"}
+                      %{
+                        :type => "POSTING_DELETE",
+                        :details => "Posting with the id #{id} was deleted."
+                      }
                     )
                     conn
                     |> put_status(200)
@@ -130,7 +136,10 @@ defmodule Api.PostingEndpoint do
                     Publisher.publish(
                       @routing_keys
                       |> Map.get("postings_get"),
-                      %{:id => id, :name => posting.name}
+                      %{
+                        :type => "POSTING_GET_ID",
+                        :details => "The posting with the id #{id} was requested."
+                      }
                     )
                     conn
                     |> put_status(200)
@@ -198,7 +207,12 @@ defmodule Api.PostingEndpoint do
                             Publisher.publish(
                               @routing_keys
                               |> Map.get("postings_update"),
-                              %{:id => id, :name => posting.name}
+                              %{
+                                :type => "POSTING_UPDATE",
+                                :details => "Posting with the id #{updated_entity.id} and the name #{
+                                  updated_entity.name
+                                } was updated."
+                              }
                             )
                             conn
                             |> put_status(201)
@@ -308,7 +322,12 @@ defmodule Api.PostingEndpoint do
                         Publisher.publish(
                           @routing_keys
                           |> Map.get("postings_save"),
-                          %{:id => id, :name => created_entity.name}
+                          %{
+                            :type => "POSTING_ADD",
+                            :details => "A new posting with the id #{created_entity.id} and name #{
+                              created_entity.name
+                            } was added."
+                          }
                         )
                         conn
                         |> put_status(201)
