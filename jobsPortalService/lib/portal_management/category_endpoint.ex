@@ -3,14 +3,19 @@ defmodule Endpoints.CategoryEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Category
-    plug CORSPlug, origin: ["http://localhost:4200"]
+        
+    @endpoint_url Application.get_env(:portal_management, :endpoint_url)
+
     plug(:match)
     plug(:dispatch)
+    plug CORSPlug,  origin: @endpoint_url.origin
+
     get "/categories" do
-        getCategoriesUrl = "http://localhost:3000/categories"
+
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
-        case HTTPoison.get(getCategoriesUrl,headers) do
+
+        case HTTPoison.get(@endpoint_url.categories, headers) do
             {:ok, response} ->
                 conn
                 |> put_resp_content_type("application/json")
@@ -28,12 +33,12 @@ defmodule Endpoints.CategoryEndpoint do
 
     post "/categories" do
 
-        postCategoriesUrl = "http://localhost:3000/categories"
         {name} = { Map.get(conn.params, "name", nil) }
         auth = get_req_header(conn, "authorization")
         body = Poison.encode!(%Category{name: name})
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
-        case HTTPoison.post(postCategoriesUrl, body, headers, []) do
+
+        case HTTPoison.post(@endpoint_url.categories, body, headers, []) do
             {:ok, response} ->
                 conn
                 |> put_resp_content_type("application/json")

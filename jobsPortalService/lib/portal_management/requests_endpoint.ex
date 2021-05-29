@@ -2,20 +2,23 @@ defmodule Endpoints.RequestEndpoint do
 
     import Plug.Conn
     use Plug.Router
-    plug CORSPlug, origin: ["http://localhost:4200"]
+
+
+    @endpoint_url Application.get_env(:portal_management, :endpoint_url)
+
     plug(:match)
     plug(:dispatch)
+    plug CORSPlug, origin: @endpoint_url.origin
 
     #send request to become employer
     post "/" do
-        sendRequestToBecomeEmployer = "http://localhost:4000/requests"
 
         auth = get_req_header(conn, "Authorization")
         IO.puts("Become employer request....")
         IO.inspect(auth)
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
         body = Poison.encode!(%{})
-        case HTTPoison.post(sendRequestToBecomeEmployer, body, headers) do
+        case HTTPoison.post(@endpoint_url.request, body, headers) do
             {:ok, response} ->
               conn
                 |> put_resp_content_type("application/json")
@@ -34,11 +37,11 @@ defmodule Endpoints.RequestEndpoint do
     #fetch my requests
 
     get "/" do
-        fetchRequestsAsAdmin = "http://localhost:4000/requests"
 
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
-        case HTTPoison.get(fetchRequestsAsAdmin, headers) do
+        
+        case HTTPoison.get(@endpoint_url.request, headers) do
             {:ok, response} ->
               conn
                 |> put_resp_content_type("application/json")
@@ -55,7 +58,7 @@ defmodule Endpoints.RequestEndpoint do
     end
 
     patch "/" do
-        changeStatus = "http://localhost:4000/requests"
+
         {id, status } = {
             Map.get(conn.params, "id", nil),
             Map.get(conn.params, "status", nil)
@@ -65,7 +68,7 @@ defmodule Endpoints.RequestEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
-        case HTTPoison.patch(changeStatus, body, headers) do
+        case HTTPoison.patch(@endpoint_url.request, body, headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")

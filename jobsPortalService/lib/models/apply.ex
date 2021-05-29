@@ -1,4 +1,4 @@
-defmodule Models.Application do
+defmodule Models.Apply do
     defstruct numberYearsExperience: nil,
     workingExperience: nil,
     education: nil,

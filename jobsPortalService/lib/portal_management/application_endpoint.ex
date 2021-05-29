@@ -2,13 +2,15 @@ defmodule Endpoints.ApplicationEndpoint do
 
     import Plug.Conn
     use Plug.Router
-    alias Models.Application
-    plug CORSPlug, origin: ["http://localhost:4200"]
+    alias Models.Apply
+     
+    @endpoint_url Application.get_env(:portal_management, :endpoint_url)
     plug(:match)
     plug(:dispatch)
+    plug CORSPlug, origin: @endpoint_url.origin
+
     #apply to posting
     post "/applications" do
-        applyUrl = "http://localhost:3000/applications"
 
         {numberYearsExperience, workingExperience, education, applicationDate,
          applicantId, postingId} = {
@@ -20,7 +22,7 @@ defmodule Endpoints.ApplicationEndpoint do
             Map.get(conn.params, "postingId", nil)
         }
 
-        body = Poison.encode!(%Application{numberYearsExperience: numberYearsExperience,
+        body = Poison.encode!(%Apply{numberYearsExperience: numberYearsExperience,
         workingExperience: workingExperience,
         education: education,
         applicationDate: applicationDate,
@@ -29,7 +31,7 @@ defmodule Endpoints.ApplicationEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
-        case HTTPoison.post(applyUrl, body, headers, []) do
+        case HTTPoison.post(@endpoint_url.applications, body, headers, []) do
             {:ok, response} ->
                 conn
                   |> put_resp_content_type("application/json")
@@ -51,11 +53,12 @@ defmodule Endpoints.ApplicationEndpoint do
 
         {id} = { Map.get(conn.path_params, "id", nil)}
         
-        fetchUrl="http://localhost:3000/applications/user/#{id}"
+        #fetchUrl="http://localhost:3000/applications/user/#{id}"
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.get(fetchUrl,headers) do
+        url = @endpoint_url.applications <> "/user/#{id}"
+        case HTTPoison.get(url,headers) do
             {:ok, response} ->
                 conn
                   |> put_resp_content_type("application/json")
@@ -77,11 +80,12 @@ defmodule Endpoints.ApplicationEndpoint do
         {id} = {
             Map.get(conn.path_params, "postingId", nil)
         }
-        fetchUrl="http://localhost:3000/applications/posting/#{id}"
+        #fetchUrl="http://localhost:3000/applications/posting/#{id}"
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.get(fetchUrl, headers) do
+        url = @endpoint_url.applications <> "/posting/#{id}"
+        case HTTPoison.get(url, headers) do
             {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -102,11 +106,12 @@ defmodule Endpoints.ApplicationEndpoint do
         {id} = {
             Map.get(conn.path_params, "id", nil)
         }
-        deleteUrl = "http://localhost:3000/applications/#{id}"
+        #deleteUrl = "http://localhost:3000/applications/#{id}"
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.delete(deleteUrl, headers) do
+        url = @endpoint_url.applications <> "/#{id}"
+        case HTTPoison.delete(url, headers) do
             {:ok, response} ->
                 conn
                 |> put_resp_content_type("application/json")
