@@ -7,5 +7,7 @@ requires:
     path: userManagementService/skaffold.yaml
   - configs: ["event-management-service"]
     path: eventLoggingService/skaffold.yaml
+  - configs: ["jobportal-service"]
+    path: jobsPortalService/skaffold.yaml
 build: {}
 deploy: {}

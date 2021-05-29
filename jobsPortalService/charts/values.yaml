@@ -1,0 +1,22 @@
+image: jps/jobportal-service:latest
+pullPolicy: IfNotPresent
+
+replicas: 1
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+env:
+  - name: USER_MANAGEMENT_SERVICE_URL
+    value: "http://user-management-service:4000"
+  - name: POSTING_MANAGEMENT_SERVICE_URL
+    value: "http://posting-management-service:4000"
+  - name: STATISTICS_SERVICE_URL
+    value: "http://statistics-service:4000"
+  - name: CORS
+    value: ""

@@ -1,0 +1,19 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+metadata:
+  name: jobportal-service
+build:
+  tagPolicy:
+    sha256: { }
+  artifacts:
+    - image: jps/jobportal-service
+  local: {}
+deploy:
+  helm:
+    releases:
+      - name: jobportal-service
+        chartPath: charts
+        valuesFiles:
+          - charts/values.yaml
+        artifactOverrides:
+          image: jps/jobportal-service
