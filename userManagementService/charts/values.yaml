@@ -1,19 +1,15 @@
-# TODO: Image and replicas are not getting set properly, templating problem with helm
-image:
-  group: jps
-  name: user-management-service
-  tag: latest
-  pullPolicy: IfNotPresent
+image: jps/user-management-service:latest
+pullPolicy: IfNotPresent
 
 replicas: 1
 
 resources:
   limits:
-    cpu: 400m
-    memory: 512Mi
+    cpu: 200m
+    memory: 256Mi
   requests:
     cpu: 100m
-    memory: 256Mi
+    memory: 128Mi
 
 env:
   - name: RABBITMQ_USER
@@ -22,3 +18,7 @@ env:
     value: "local-password"
   - name: RABBITMQ_HOST
     value: "rabbitmq"
+  - name: APP_SECRET_KEY
+    value: "secret"
+  - name: MONGODB_HOST
+    value: "mongodb"

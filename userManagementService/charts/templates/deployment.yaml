@@ -5,7 +5,7 @@ metadata:
     app: user-management-service
   name: user-management-service
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: user-management-service
@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: user-management-service
-          image: jps/user-management-service:latest
-          imagePullPolicy: IfNotPresent
+          image: {{ .Values.image }}
+          imagePullPolicy: {{ .Values.pullPolicy }}
           resources:
           {{- toYaml .Values.resources | nindent 12 }}
           env:
