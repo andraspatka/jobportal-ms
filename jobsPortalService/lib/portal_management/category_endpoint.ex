@@ -4,8 +4,7 @@ defmodule Endpoints.CategoryEndpoint do
     use Plug.Router
     alias Models.Category
         
-    @categories Application.get_env(:portal_management, :categories)
-    @origin Application.get_env(:portal_management, :origin)
+    @endpoint_url Application.get_env(:portal_management, :endpoint_url)
 
     plug(:match)
     plug(:dispatch)
@@ -16,7 +15,7 @@ defmodule Endpoints.CategoryEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.get(@categories, headers) do
+        case HTTPoison.get(@endpoint_url.categories, headers) do
             {:ok, response} ->
                 conn
                 |> put_resp_content_type("application/json")
@@ -39,7 +38,7 @@ defmodule Endpoints.CategoryEndpoint do
         body = Poison.encode!(%Category{name: name})
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
-        case HTTPoison.post(@categories, body, headers, []) do
+        case HTTPoison.post(@endpoint_url.categories, body, headers, []) do
             {:ok, response} ->
                 conn
                 |> put_resp_content_type("application/json")

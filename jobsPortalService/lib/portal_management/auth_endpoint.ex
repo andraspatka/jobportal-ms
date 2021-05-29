@@ -7,10 +7,9 @@ defmodule Endpoints.AuthEndpoint do
   alias Models.Register
   alias Models.Company
 
-  @login Application.get_env(:portal_management, :login)
-  @register Application.get_env(:portal_management, :register)
-  @origin Application.get_env(:portal_management, :origin)
-  @companies Application.get_env(:portal_management, :companies)
+  
+  @endpoint_url Application.get_env(:portal_management, :endpoint_url)
+  
   plug(:match)
   plug(:dispatch)
   plug CORSPlug, origin: ["http://localhost:4200"]
@@ -25,7 +24,7 @@ defmodule Endpoints.AuthEndpoint do
     body = Poison.encode!(%Login{email: email, password: password})
     headers = [{"Content-type", "application/json"}]
     
-    case HTTPoison.post(@login, body, headers) do
+    case HTTPoison.post(@endpoint_url.login, body, headers) do
       {:ok, response} ->
         conn
           |> put_resp_content_type("application/json")
@@ -56,7 +55,7 @@ defmodule Endpoints.AuthEndpoint do
     role: role,company: company})
     headers = [{"Content-type", "application/json"}]
 
-    case HTTPoison.post(@register, body, headers, []) do
+    case HTTPoison.post(@endpoint_url.register, body, headers, []) do
       {:ok, response} ->
         conn
           |> put_resp_content_type("application/json")
@@ -74,7 +73,7 @@ defmodule Endpoints.AuthEndpoint do
 
   get "/companies" do
    
-    IO.inspect(@companies)
+    IO.inspect(@endpoint_url.companies)
     # case HTTPoison.get(@companies) do
     #   {:ok, response} ->
     #     conn
@@ -100,7 +99,7 @@ defmodule Endpoints.AuthEndpoint do
     body = Poison.encode!(%Company{name: name, admin: admin})
     headers = [{"Content-type", "application/json"}]
 
-    case HTTPoison.post(@companies, body, headers) do
+    case HTTPoison.post(@endpoint_url.companies, body, headers) do
       {:ok, response} ->
         conn
           |> put_resp_content_type("application/json")

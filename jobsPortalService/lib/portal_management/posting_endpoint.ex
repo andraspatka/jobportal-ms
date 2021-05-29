@@ -4,8 +4,7 @@ defmodule Endpoints.PostingEndpoint do
     use Plug.Router
     alias Models.Postings
 
-    @posting Application.get_env(:portal_management, :posting)
-    @origin Application.get_env(:portal_management, :origin)
+    @endpoint_url Application.get_env(:portal_management, :endpoint_url)
 
     plug(:match)
     plug(:dispatch)
@@ -16,7 +15,7 @@ defmodule Endpoints.PostingEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        case HTTPoison.get(@posting, headers) do
+        case HTTPoison.get(@endpoint_url.posting, headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -41,7 +40,7 @@ defmodule Endpoints.PostingEndpoint do
           Map.get(conn.path_params, "id", nil)
         }
 
-        url = "#{@posting}" <> "#{id}"
+        url = @endpoint_url.posting <> "/#{id}"
 
         case HTTPoison.delete(url, headers,[]) do
           {:ok, response} ->
@@ -85,7 +84,7 @@ defmodule Endpoints.PostingEndpoint do
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
 
-        case HTTPoison.post(@posting, body, headers, []) do
+        case HTTPoison.post(@endpoint_url.posting, body, headers, []) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")
@@ -118,7 +117,7 @@ defmodule Endpoints.PostingEndpoint do
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
 
-        case HTTPoison.patch(@posting, body, headers, []) do
+        case HTTPoison.patch(@endpoint_url.posting, body, headers, []) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")

@@ -4,8 +4,7 @@ defmodule Endpoints.RequestEndpoint do
     use Plug.Router
 
 
-    @request Application.get_env(:portal_management, :request)
-    @origin Application.get_env(:portal_management, :origin)
+    @endpoint_url Application.get_env(:portal_management, :endpoint_url)
 
     plug(:match)
     plug(:dispatch)
@@ -19,7 +18,7 @@ defmodule Endpoints.RequestEndpoint do
         IO.inspect(auth)
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
         body = Poison.encode!(%{})
-        case HTTPoison.post(@request, body, headers) do
+        case HTTPoison.post(@endpoint_url.request, body, headers) do
             {:ok, response} ->
               conn
                 |> put_resp_content_type("application/json")
@@ -41,7 +40,8 @@ defmodule Endpoints.RequestEndpoint do
 
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
-        case HTTPoison.get(@request, headers) do
+        
+        case HTTPoison.get(@endpoint_url.request, headers) do
             {:ok, response} ->
               conn
                 |> put_resp_content_type("application/json")
@@ -68,7 +68,7 @@ defmodule Endpoints.RequestEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
-        case HTTPoison.patch(@request, body, headers) do
+        case HTTPoison.patch(@endpoint_url.request, body, headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")

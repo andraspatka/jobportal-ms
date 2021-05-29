@@ -4,8 +4,7 @@ defmodule Endpoints.ApplicationEndpoint do
     use Plug.Router
     alias Models.Apply
      
-    @applications Application.get_env(:portal_management, :applications)
-    @origin Application.get_env(:portal_management, :origin)
+    @endpoint_url Application.get_env(:portal_management, :endpoint_url)
     plug(:match)
     plug(:dispatch)
     plug CORSPlug, origin: ["http://localhost:4200"]
@@ -32,7 +31,7 @@ defmodule Endpoints.ApplicationEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
 
-        case HTTPoison.post(@applications, body, headers, []) do
+        case HTTPoison.post(@endpoint_url.applications, body, headers, []) do
             {:ok, response} ->
                 conn
                   |> put_resp_content_type("application/json")
@@ -58,7 +57,7 @@ defmodule Endpoints.ApplicationEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        url = "#{@applications}" <> "user/#{id}"
+        url = @endpoint_url.applications <> "/user/#{id}"
         case HTTPoison.get(url,headers) do
             {:ok, response} ->
                 conn
@@ -85,7 +84,7 @@ defmodule Endpoints.ApplicationEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        url = "#{@applications}" <> "posting/#{id}"
+        url = @endpoint_url.applications <> "/posting/#{id}"
         case HTTPoison.get(url, headers) do
             {:ok, response} ->
             conn
@@ -111,7 +110,7 @@ defmodule Endpoints.ApplicationEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        url = "#{@applications}" <> "#{id}"
+        url = @endpoint_url.applications <> "/#{id}"
         case HTTPoison.delete(url, headers) do
             {:ok, response} ->
                 conn

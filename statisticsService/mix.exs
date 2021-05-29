@@ -1,13 +1,14 @@
-defmodule Statistics.MixProject do
+defmodule StatisticsManagement.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :statistics,
+      app: :statistics_management,
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps()
+      
     ]
   end
 
@@ -15,7 +16,7 @@ defmodule Statistics.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {App.Application, []}
+      mod: {StatisticsManagement.Application, []}
     ]
   end
 
