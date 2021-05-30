@@ -1,5 +1,5 @@
 image: jobportal.azurecr.io/jobportal-service:v2
-pullPolicy: IfNotPresent
+pullPolicy: Always
 
 replicas: 1
 

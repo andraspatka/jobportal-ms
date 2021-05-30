@@ -17,3 +17,4 @@ deploy:
           - charts/values.yaml
         artifactOverrides:
           image: jps/event-management-service
+          pullPolicy: IfNotPresent

@@ -1,20 +1,20 @@
 apiVersion: skaffold/v2beta16
 kind: Config
 metadata:
-  name: posting-management-service
+  name: statistics-service
 build:
   tagPolicy:
     sha256: { }
   artifacts:
-    - image: jps/posting-management-service
+    - image: jps/statistics-service
   local: {}
 deploy:
   helm:
     releases:
-      - name: posting-management-service
+      - name: statistics-service
         chartPath: charts
         valuesFiles:
           - charts/values.yaml
         artifactOverrides:
-          image: jps/posting-management-service
+          image: jps/statistics-service
           pullPolicy: IfNotPresent

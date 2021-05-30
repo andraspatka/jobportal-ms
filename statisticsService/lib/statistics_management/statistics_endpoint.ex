@@ -7,12 +7,16 @@ defmodule StatisticsManagement.StatisticsEnpoint do
 
     @events_url Application.get_env(:statistics_management, :events_url)
 
+    defp event_man_endp(endpoint) do
+      Application.get_env(:statistics_management, :event_management_service_url) <> endpoint
+    end
+
     get "/" do
 
         auth = get_req_header(conn, "Authorization")
         headers = [{"Authorization","#{auth}"}]
-        
-        case HTTPoison.get(@events_url, headers) do
+        url = event_man_endp(@events_url)
+        case HTTPoison.get(url, headers) do
             {:ok, response} ->
               conn
                 |> put_resp_content_type("application/json")
@@ -33,8 +37,8 @@ defmodule StatisticsManagement.StatisticsEnpoint do
       auth = get_req_header(conn, "Authorization")
       headers = [{"Authorization","#{auth}"}]
       {type} = { Map.get(conn.path_params, "type", nil) }
-
-      case HTTPoison.get(@events_url <> "/#{type}", headers) do
+      url = event_man_endp(@events_url) <> "/#{type}"
+      case HTTPoison.get(url, headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")

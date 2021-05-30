@@ -1,5 +1,5 @@
 image: jobportal.azurecr.io/user-management-service:v1
-pullPolicy: IfNotPresent
+pullPolicy: Always
 
 replicas: 1
 
