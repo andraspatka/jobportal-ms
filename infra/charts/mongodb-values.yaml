@@ -225,6 +225,9 @@ initdbScripts:
       db.user.insert({"created_at" : 1621715109, "email" : "admin@msg.com", "firstname" : "Admin", "id" : "af711ff0-bb26-11eb-902a-708bcd51d01e", "lastname" : "Doe", "password" : "\$pbkdf2-sha512\$160000\$5WM8kM3OFdzbe7I5G1nItQ\$pnAlSCEwIz2UdfBdfWQFHf3r3biPVeiqYDZRFi1qKPz23pt2rzouAHsNTYT5NTyL7Um9URIFVBpcdUiTLECYNw", "role" : "2", "updated_at" : 1621715109 })
       db.company.insert({name: "msg", admin: "af711ff0-bb26-11eb-902a-708bcd51d01e"})
       db.company_employee.insert({company_name: "msg", user_id: "af711ff0-bb26-11eb-902a-708bcd51d01e"})
+      use postings
+      db.category.insert({"created_at" : 1621715109, "uuid" : "b4e96d9c-c121-11eb-8529-0242ac130003", "name" : "IT", "updated_at" : 1621715109 })
+      db.category.insert({"created_at" : 1621715109, "uuid" : "b4e96d9c-c121-11eb-8529-0242ac130004", "name" : "HR", "updated_at" : 1621715109 })
       quit()
       exit
       EOF
@@ -379,12 +382,12 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  limits: {}
-  #   cpu: 100m
-  #   memory: 128Mi
-  requests: {}
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
 
 ## MongoDB(R) pods' liveness and readiness probes. Evaluated as a template.
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
