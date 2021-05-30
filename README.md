@@ -121,3 +121,15 @@ skaffold run -m user-management
 skaffold run -m events-management
 
 ```
+
+# Azure
+
+```bash
+az login
+az aks get-credentials --resource-group jobportal --name jobportal
+cd userManagementService
+az acr build --image user-management-service:v1 --registry jobportal --file Dockerfile .
+helm install user-management-service charts/
+cd ..
+skaffold run -m infra
+```
