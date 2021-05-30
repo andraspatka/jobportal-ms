@@ -1,4 +1,4 @@
-image: jps/user-management-service:latest
+image: jobportal.azurecr.io/user-management-service:v1
 pullPolicy: IfNotPresent
 
 replicas: 1
