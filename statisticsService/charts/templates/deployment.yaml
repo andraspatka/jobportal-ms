@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: statistics-service
+  name: statistics-service
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: statistics-service
+  template:
+    metadata:
+      labels:
+        app: statistics-service
+    spec:
+      containers:
+        - name: statistics-service
+          image: {{ .Values.image }}
+          imagePullPolicy: {{ .Values.pullPolicy }}
+          resources:
+          {{- toYaml .Values.resources | nindent 12 }}
