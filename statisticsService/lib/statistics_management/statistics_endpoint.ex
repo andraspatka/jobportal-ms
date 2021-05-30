@@ -13,8 +13,9 @@ defmodule StatisticsManagement.StatisticsEnpoint do
 
     get "/" do
 
-        auth = get_req_header(conn, "Authorization")
+        auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
+        IO.puts(auth)
         url = event_man_endp(@events_url)
         case HTTPoison.get(url, headers) do
             {:ok, response} ->

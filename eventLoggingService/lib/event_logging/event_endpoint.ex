@@ -35,6 +35,7 @@ defmodule Api.EventEndpoint do
     do
     headers = get_req_header(conn, "authorization")
     header = [{"Content-type", "application/json"}]
+    IO.puts(headers)
     case headers do
       ["Bearer " <> token] ->
         body = Poison.encode!(%JwtToken{jwt: token})
