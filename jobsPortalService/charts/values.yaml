@@ -18,5 +18,5 @@ env:
     value: "http://posting-management-service:4000"
   - name: STATISTICS_SERVICE_URL
     value: "http://statistics-service:4000"
-  - name: CORS
+  - name: CORS #TODO CORS CONFIG
     value: ""
