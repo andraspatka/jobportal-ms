@@ -143,12 +143,12 @@ cd ..
 cd jobsPortalService
 az acr build --image jobportal-service:v2 --registry jobportal --file Dockerfile .
 helm install jobportal-service charts/
-cd..
+cd ..
 
 cd eventLoggingService
 az acr build --image event-management-service:v1 --registry jobportal --file Dockerfile .
 helm install event-management-service charts/
-cd..
+cd ..
 
 cd postingsService
 az acr build --image posting-management-service:v1 --registry jobportal --file Dockerfile . 

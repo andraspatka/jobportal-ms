@@ -20,3 +20,5 @@ env:
     value: "rabbitmq"
   - name: MONGODB_HOST
     value: "mongodb"
+  - name: USER_MANAGEMENT_SERVICE_URL
+    value: "http://user-management-service:4000"

@@ -7,11 +7,8 @@ defmodule Api.EventEndpoint do
   alias Api.Plugs.JsonTestPlug
   alias Api.Service.Consumer
 
-  @api_port Application.get_env(:events_management, :api_port)
-  @api_host Application.get_env(:events_management, :api_host)
-  @api_scheme Application.get_env(:events_management, :api_scheme)
   @queue_events Application.get_env(:events_management, :event_users_queue)
-  @token_verification 'http://localhost:4000/tokeninfo'
+  @token_verification Application.get_env(:events_management, :token_verification)
 
   plug :match
   plug :dispatch

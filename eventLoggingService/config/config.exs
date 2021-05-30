@@ -10,6 +10,7 @@ config :events_management,
        api_host: "localhost",
        api_port: 4343,
        api_scheme: "http",
+       token_verification: "http://localhost:4000/tokeninfo",
        event_url: "guest:guest@localhost",
        event_exchange: "logging",
        event_users_queue: "user_management"
