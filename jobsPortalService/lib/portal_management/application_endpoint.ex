@@ -3,11 +3,13 @@ defmodule Endpoints.ApplicationEndpoint do
     import Plug.Conn
     use Plug.Router
     alias Models.Apply
+    alias Services.Url
      
     @endpoint_url Application.get_env(:portal_management, :endpoint_url)
+    @origin Application.get_env(:portal_management, :origin)
     plug(:match)
     plug(:dispatch)
-    plug CORSPlug, origin: @endpoint_url.origin
+    plug CORSPlug, origin: @origin
 
     #apply to posting
     post "/applications" do
@@ -30,8 +32,8 @@ defmodule Endpoints.ApplicationEndpoint do
         postingId: postingId})
         auth = get_req_header(conn, "authorization")
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
-
-        case HTTPoison.post(@endpoint_url.applications, body, headers, []) do
+        url = Url.posting_endp(@endpoint_url.posting_applications)
+        case HTTPoison.post(url, body, headers, []) do
             {:ok, response} ->
                 conn
                   |> put_resp_content_type("application/json")
@@ -57,7 +59,7 @@ defmodule Endpoints.ApplicationEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        url = @endpoint_url.applications <> "/user/#{id}"
+        url = Url.posting_endp(@endpoint_url.posting_applications) <> "/user/#{id}"
         case HTTPoison.get(url,headers) do
             {:ok, response} ->
                 conn
@@ -84,7 +86,7 @@ defmodule Endpoints.ApplicationEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        url = @endpoint_url.applications <> "/posting/#{id}"
+        url = Url.posting_endp(@endpoint_url.posting_applications) <> "/posting/#{id}"
         case HTTPoison.get(url, headers) do
             {:ok, response} ->
             conn
@@ -110,7 +112,7 @@ defmodule Endpoints.ApplicationEndpoint do
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
 
-        url = @endpoint_url.applications <> "/#{id}"
+        url = Url.posting_endp(@endpoint_url.posting_applications) <> "/#{id}"
         case HTTPoison.delete(url, headers) do
             {:ok, response} ->
                 conn

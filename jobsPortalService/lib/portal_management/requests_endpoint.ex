@@ -2,13 +2,14 @@ defmodule Endpoints.RequestEndpoint do
 
     import Plug.Conn
     use Plug.Router
+    alias Services.Url
 
 
     @endpoint_url Application.get_env(:portal_management, :endpoint_url)
-
+    @origin Application.get_env(:portal_management, :origin)
     plug(:match)
     plug(:dispatch)
-    plug CORSPlug, origin: @endpoint_url.origin
+    plug CORSPlug, origin: @origin
 
     #send request to become employer
     post "/" do
@@ -18,7 +19,8 @@ defmodule Endpoints.RequestEndpoint do
         IO.inspect(auth)
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
         body = Poison.encode!(%{})
-        case HTTPoison.post(@endpoint_url.request, body, headers) do
+        url = Url.user_endp(@endpoint_url.user_request)
+        case HTTPoison.post(url, body, headers) do
             {:ok, response} ->
               conn
                 |> put_resp_content_type("application/json")
@@ -40,8 +42,8 @@ defmodule Endpoints.RequestEndpoint do
 
         auth = get_req_header(conn, "authorization")
         headers = [{"Authorization","#{auth}"}]
-        
-        case HTTPoison.get(@endpoint_url.request, headers) do
+        url = Url.user_endp(@endpoint_url.user_request)
+        case HTTPoison.get(url, headers) do
             {:ok, response} ->
               conn
                 |> put_resp_content_type("application/json")
@@ -67,8 +69,8 @@ defmodule Endpoints.RequestEndpoint do
         body = Poison.encode!(%{id: id, status: status})
         auth = get_req_header(conn, "authorization")
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]
-
-        case HTTPoison.patch(@endpoint_url.request, body, headers) do
+        url = Url.user_endp(@endpoint_url.user_request)
+        case HTTPoison.patch(url, body, headers) do
           {:ok, response} ->
             conn
               |> put_resp_content_type("application/json")

@@ -1,0 +1,19 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+metadata:
+  name: event-management-service
+build:
+  tagPolicy:
+    sha256: { }
+  artifacts:
+    - image: jps/event-management-service
+  local: {}
+deploy:
+  helm:
+    releases:
+      - name: event-management-service
+        chartPath: charts
+        valuesFiles:
+          - charts/values.yaml
+        artifactOverrides:
+          image: jps/event-management-service

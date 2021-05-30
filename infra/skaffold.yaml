@@ -1,0 +1,24 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+metadata:
+  name: infra
+build: {}
+deploy:
+  helm:
+    releases:
+      - name: rabbitmq
+        remoteChart: bitnami/rabbitmq
+        version: 8.13.1
+        valuesFiles:
+          - ./charts/rabbitmq-values.yaml
+      - name: mongodb
+        remoteChart: bitnami/mongodb
+        version: 10.16.4
+        valuesFiles:
+          - ./charts/mongodb-values.yaml
+portForward:
+  - resourceType: service
+    resourceName: rabbitmq
+    namespace: default
+    port: 15672 # Rabbitmq management console port
+    localPort: 15672

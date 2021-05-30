@@ -39,9 +39,32 @@ mix run --no-halt
 
 ## MongoDB
 
-```
+```bash
 docker run -p 27017:27017 -d --name mongodb mongo
 ```
+
+## Rabbitmq
+
+```bash
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```
+You will need to create an exchange with two bindings and a queue in order for the application to work with rabbitmq.
+You may do that via the rabbitmq management UI or by simply running the following python script:
+```bash
+infra/createExchangeQueues.py
+```
+If the script gives an error, then you should verify if the USER and PASSWORD fields conform to your local rabbitmq installation.
+
+
+Exchange name:
+ - logging
+
+Queue name:
+ - user_management
+
+Bindings:
+ - jobportal.postings.*.events -> user_management via logging
+ - jobportal.user.*.events -> user_management via logging
 
 # Curls
 
@@ -77,3 +100,24 @@ db.company_employee.insert({company_name: "msg", user_id: "af711ff0-bb26-11eb-90
 - log in as admin
 - query requests
 - approve with admin: 8d41b900-bd9a-11eb-8ef8-708bcd51d01d
+
+# Skaffold
+
+requirements:
+- skaffold
+- helm
+- kubernetes cluster
+- docker-desktop
+
+```bash
+# Deploy rabbitmq and mongodb. Mongodb has an initDbScript which inserts some test data (two companies and two users)
+skaffold run -m infra
+
+# Run script for setting up rabbitmq (create exchange, queue, bindings)
+infra/createExchangeQueues.py
+
+skaffold run -m user-management
+
+skaffold run -m events-management
+
+```

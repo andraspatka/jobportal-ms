@@ -7,3 +7,5 @@ README.md
 *.iml
 .git
 .gitignore
+charts
+skaffold.yaml

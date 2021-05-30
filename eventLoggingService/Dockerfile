@@ -21,4 +21,4 @@ WORKDIR app
 
 COPY --from=releaser /app/_build .
 
-CMD ["/app/prod/rel/user_management/bin/user_management", "start"]
+CMD ["/app/prod/rel/events_management/bin/events_management", "start"]

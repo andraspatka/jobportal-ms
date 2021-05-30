@@ -1,0 +1,10 @@
+apiVersion: v2
+name: jobportal-service
+version: 1.0.0
+description: |
+  A Helm chart to build and deploy an app which servers as an abstraction layer for the ui.
+  This service communicates with the other microservices and as such hides the complexity of the microservice architecture.
+keywords:
+  - runtimes
+  - elixir
+  - amqp
