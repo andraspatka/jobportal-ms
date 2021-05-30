@@ -7,14 +7,15 @@ defmodule Endpoints.RequestEndpoint do
 
     @endpoint_url Application.get_env(:portal_management, :endpoint_url)
     @origin Application.get_env(:portal_management, :origin)
+
+    plug CORSPlug, origin: @origin
     plug(:match)
     plug(:dispatch)
-    plug CORSPlug, origin: @origin
 
     #send request to become employer
     post "/" do
 
-        auth = get_req_header(conn, "Authorization")
+        auth = get_req_header(conn, "authorization")
         IO.puts("Become employer request....")
         IO.inspect(auth)
         headers = [{"Content-type", "application/json"}, {"Authorization","#{auth}"}]

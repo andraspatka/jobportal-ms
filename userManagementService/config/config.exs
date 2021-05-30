@@ -20,6 +20,7 @@ config :user_management,
          :user_login => "jobportal.user.login.events",
          :user_logout => "jobportal.user.logout.events",
          :user_register => "jobportal.user.register.events",
+         :companies_get_all => "jobportal.user.get_companies.events"
        },
        roles: %{
          :employee => 0,
