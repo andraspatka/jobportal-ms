@@ -1,0 +1,24 @@
+image: jobportal.azurecr.io/posting-management-service:v1
+pullPolicy: IfNotPresent
+
+replicas: 1
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+env:
+  - name: RABBITMQ_USER
+    value: "user"
+  - name: RABBITMQ_PASSWORD
+    value: "local-password"
+  - name: RABBITMQ_HOST
+    value: "rabbitmq"
+  - name: MONGODB_HOST
+    value: "mongodb"
+  - name: USER_MANAGEMENT_SERVICE_URL
+    value: "http://user-management-service:4000"
