@@ -7,9 +7,10 @@ defmodule Endpoints.ApplicationEndpoint do
      
     @endpoint_url Application.get_env(:portal_management, :endpoint_url)
     @origin Application.get_env(:portal_management, :origin)
+    
+    plug CORSPlug, origin: @origin
     plug(:match)
     plug(:dispatch)
-    plug CORSPlug, origin: @origin
 
     #apply to posting
     post "/applications" do
