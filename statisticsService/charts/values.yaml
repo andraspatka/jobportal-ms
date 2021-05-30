@@ -1,5 +1,5 @@
 image: jobportal.azurecr.io/statistics-service:v1
-pullPolicy: IfNotPresent
+pullPolicy: Always
 
 replicas: 1
 

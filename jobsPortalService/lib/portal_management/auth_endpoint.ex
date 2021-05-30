@@ -25,8 +25,9 @@ defmodule Endpoints.AuthEndpoint do
    
     body = Poison.encode!(%Login{email: email, password: password})
     headers = [{"Content-type", "application/json"}]
+    options = [recv_timeout: 10000]
     url = Url.user_endp(@endpoint_url.user_login)
-    case HTTPoison.post(url, body, headers) do
+    case HTTPoison.post(url, body, headers, options) do
       {:ok, response} ->
         conn
           |> put_resp_content_type("application/json")

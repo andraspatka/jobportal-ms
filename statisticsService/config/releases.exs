@@ -1,3 +1,3 @@
 import Config
 
-config :statistics_management, :db_host, System.fetch_env!("MONGODB_HOST")
+config :statistics_management, :api_port, 4000

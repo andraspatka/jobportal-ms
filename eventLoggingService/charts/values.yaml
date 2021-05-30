@@ -1,4 +1,4 @@
-image: jps/event-management-service:latest
+image: jobportal.azurecr.io/event-management-service:v1
 pullPolicy: IfNotPresent
 
 replicas: 1

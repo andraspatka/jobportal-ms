@@ -131,11 +131,34 @@ skaffold run -m events-management
 ```bash
 az login
 az aks get-credentials --resource-group jobportal --name jobportal
+skaffold run -m infra
+kubectl port-forward rabbitmq-0 5672:5672
+infra/createExchangeQueues.py
+
 cd userManagementService
 az acr build --image user-management-service:v1 --registry jobportal --file Dockerfile .
 helm install user-management-service charts/
 cd ..
-skaffold run -m infra
+
+cd jobsPortalService
+az acr build --image jobportal-service:v2 --registry jobportal --file Dockerfile .
+helm install jobportal-service charts/
+cd..
+
+cd eventLoggingService
+az acr build --image event-management-service:v1 --registry jobportal --file Dockerfile .
+helm install event-management-service charts/
+cd..
+
+cd postingsService
+az acr build --image posting-management-service:v1 --registry jobportal --file Dockerfile . 
+helm install posting-management-service charts/
+cd ..
+
+cd statisticsService
+az acr build --image statistics-service:v1 --registry jobportal --file Dockerfile . 
+helm install statistics-service charts/
+cd ..
 ```
 
 # Kubectl cheat sheet

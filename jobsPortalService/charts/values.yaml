@@ -1,4 +1,4 @@
-image: jps/jobportal-service:latest
+image: jobportal.azurecr.io/jobportal-service:v2
 pullPolicy: IfNotPresent
 
 replicas: 1
