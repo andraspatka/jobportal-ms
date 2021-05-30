@@ -14,7 +14,9 @@ defmodule Endpoints.StatisticsEndpoint do
 
     get "/" do
         auth = get_req_header(conn, "authorization")
+        IO.inspect(auth)
         headers = [{"Authorization","#{auth}"}]
+        IO.inspect(headers)
         url = Url.stat_endp(@endpoint_url.statistics)
         case HTTPoison.get(url, headers) do
             {:ok, response} ->

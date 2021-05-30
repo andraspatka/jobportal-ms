@@ -21,6 +21,7 @@ defmodule Api.JwtValidation do
     {jwt} = {
       Map.get(conn.params, "jwt", nil),
     }
+    IO.puts("JWT validation tokeninfo endpoint called...")
     {:ok, service} = Api.Service.Auth.start_link
     case Api.Service.Auth.validate_token(service, jwt) do
       {:ok, _} ->

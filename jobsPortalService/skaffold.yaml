@@ -15,6 +15,6 @@ deploy:
         chartPath: charts
         valuesFiles:
           - charts/values.yaml
+          - charts/values.local.yaml
         artifactOverrides:
           image: jps/jobportal-service
-          pullPolicy: IfNotPresent

@@ -8,12 +8,15 @@ defmodule Api.EventEndpoint do
   alias Api.Service.Consumer
 
   @queue_events Application.get_env(:events_management, :event_users_queue)
-  @token_verification Application.get_env(:events_management, :token_verification)
 
   plug :match
   plug :dispatch
   plug JsonTestPlug
   plug :encode_response
+
+  defp token_info_path() do
+    Application.get_env(:events_management, :token_verification)
+  end
 
   defp encode_response(conn, _) do
     conn
@@ -32,11 +35,12 @@ defmodule Api.EventEndpoint do
     do
     headers = get_req_header(conn, "authorization")
     header = [{"Content-type", "application/json"}]
-    IO.puts(headers)
+    IO.puts("Headers: #{headers}")
+    IO.puts("#{token_info_path}")
     case headers do
       ["Bearer " <> token] ->
         body = Poison.encode!(%JwtToken{jwt: token})
-        case HTTPoison.post(@token_verification, body, header) do
+        case HTTPoison.post(token_info_path, body, header) do
           {_, response} ->
             cond do
               response.status_code == 200 ->
@@ -45,12 +49,14 @@ defmodule Api.EventEndpoint do
                 conn
                 |> put_status(200)
                 |> assign(:jsonapi, events)
-              response.status_code == 400 -> conn
-                                             |> put_status(400)
-                                             |> assign(
-                                                  :jsonapi,
-                                                  %{body: "Token is invalid!"}
-                                                )
+              response.status_code == 400 ->
+                conn
+                |> put_status(400)
+                |> assign(:jsonapi, %{body: "Token is invalid!"} )
+              true ->
+                conn
+                |> put_status(500)
+                |> assign(:jsonapi, %{body: "Unexpected error, invalid response from tokeninfo", code: response.status_code})
             end
         end
     end
@@ -66,7 +72,7 @@ defmodule Api.EventEndpoint do
     case headers do
       ["Bearer " <> token] ->
         body = Poison.encode!(%JwtToken{jwt: token})
-        case HTTPoison.post(@token_verification, body, header) do
+        case HTTPoison.post(token_info_path, body, header) do
           {_, response} ->
             cond do
               response.status_code == 200 ->
@@ -75,12 +81,10 @@ defmodule Api.EventEndpoint do
                 conn
                 |> put_status(200)
                 |> assign(:jsonapi, events)
-              response.status_code == 400 -> conn
-                                             |> put_status(400)
-                                             |> assign(
-                                                  :jsonapi,
-                                                  %{body: "Token is invalid!"}
-                                                )
+              response.status_code == 400 ->
+                conn
+                |> put_status(400)
+                |> assign(:jsonapi, %{body: "Token is invalid!"})
             end
         end
     end

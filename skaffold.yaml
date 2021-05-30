@@ -12,6 +12,6 @@ requires:
   - configs: ["jobportal-service"]
     path: jobsPortalService/skaffold.yaml
   - configs: ["statistics-service"]
-    path: statistcsService/skaffold.yaml
+    path: statisticsService/skaffold.yaml
 build: {}
 deploy: {}
