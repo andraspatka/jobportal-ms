@@ -59,6 +59,10 @@ defmodule Api.EventEndpoint do
                 |> assign(:jsonapi, %{body: "Unexpected error, invalid response from tokeninfo", code: response.status_code})
             end
         end
+      [""] ->
+        conn
+        |> put_status(401)
+        |> assign(:jsonapi, %{body: "No Authorization header provided"})
     end
   end
 
@@ -87,6 +91,10 @@ defmodule Api.EventEndpoint do
                 |> assign(:jsonapi, %{body: "Token is invalid!"})
             end
         end
+      [""] ->
+        conn
+        |> put_status(401)
+        |> assign(:jsonapi, %{body: "No Authorization header provided"})
     end
   end
 
