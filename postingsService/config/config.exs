@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :postings_management,
        db_host: "localhost",
@@ -13,8 +13,7 @@ config :postings_management,
        api_host: "localhost",
        api_port: 3000,
        api_scheme: "http",
-       app_secret_key: "secret",
-       jwt_validity: 3600,
+       token_verification: "http://localhost:4000/tokeninfo",
        routing_keys: %{
          # Events related to categories
          "category_added" => "jobportal.postings.category_added.events",

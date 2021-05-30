@@ -12,7 +12,7 @@ defmodule Api.PostingEndpoint do
   @api_host Application.get_env(:postings_management, :api_host)
   @api_scheme Application.get_env(:postings_management, :api_scheme)
   @routing_keys Application.get_env(:postings_management, :routing_keys)
-  @token_verification 'http://localhost:4000/tokeninfo'
+  @token_verification Application.get_env(:postings_management, :token_verification)
 
   plug :match
   plug :dispatch
