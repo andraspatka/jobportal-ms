@@ -11,7 +11,10 @@ defmodule Api.CategoryEndpoint do
   @api_host Application.get_env(:postings_management, :api_host)
   @api_scheme Application.get_env(:postings_management, :api_scheme)
   @routing_keys Application.get_env(:postings_management, :routing_keys)
-  @token_verification Application.get_env(:postings_management, :token_verification)
+
+  defp tokeninfo_endp() do
+    Application.get_env(:postings_management, :token_verification)
+  end
 
   plug :match
   plug :dispatch
@@ -37,7 +40,7 @@ defmodule Api.CategoryEndpoint do
     case headers do
       ["Bearer " <> token] ->
         body = Poison.encode!(%JwtToken{jwt: token})
-        case HTTPoison.post(@token_verification, body, header) do
+        case HTTPoison.post(tokeninfo_endp, body, header) do
           {_, response} ->
             cond do
               response.status_code == 200 ->
@@ -66,6 +69,10 @@ defmodule Api.CategoryEndpoint do
                                                   :jsonapi,
                                                   %{body: "Token is invalid!"}
                                                 )
+              true ->
+                conn
+                |> put_status(response.status_code)
+                |> assign(:jsonapi, %{body: "Unexpected error: #{response.status_code}"})
             end
         end
     end
@@ -77,7 +84,7 @@ defmodule Api.CategoryEndpoint do
     case headers do
       ["Bearer " <> token] ->
         body = Poison.encode!(%JwtToken{jwt: token})
-        case HTTPoison.post(@token_verification, body, header) do
+        case HTTPoison.post(tokeninfo_endp, body, header) do
           {_, response} ->
             cond do
               response.status_code == 200 ->
@@ -127,6 +134,10 @@ defmodule Api.CategoryEndpoint do
                                                   :jsonapi,
                                                   %{body: "Token is invalid!"}
                                                 )
+              true ->
+                conn
+                |> put_status(response.status_code)
+                |> assign(:jsonapi, %{body: "Unexpected error: #{response.status_code}"})
             end
         end
     end
