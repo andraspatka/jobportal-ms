@@ -226,8 +226,8 @@ initdbScripts:
       db.company.insert({name: "msg", admin: "af711ff0-bb26-11eb-902a-708bcd51d01e"})
       db.company_employee.insert({company_name: "msg", user_id: "af711ff0-bb26-11eb-902a-708bcd51d01e"})
       use postings
-      db.category.insert({"created_at" : 1621715109, "uuid" : "b4e96d9c-c121-11eb-8529-0242ac130003", "name" : "IT", "updated_at" : 1621715109 })
-      db.category.insert({"created_at" : 1621715109, "uuid" : "b4e96d9c-c121-11eb-8529-0242ac130004", "name" : "HR", "updated_at" : 1621715109 })
+      db.categories.insert({"created_at" : 1621715109, "uuid" : "b4e96d9c-c121-11eb-8529-0242ac130003", "name" : "IT", "updated_at" : 1621715109 })
+      db.categories.insert({"created_at" : 1621715109, "uuid" : "b4e96d9c-c121-11eb-8529-0242ac130004", "name" : "HR", "updated_at" : 1621715109 })
       quit()
       exit
       EOF
