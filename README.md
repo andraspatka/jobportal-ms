@@ -161,6 +161,16 @@ helm install statistics-service charts/
 cd ..
 ```
 
+Stop AKS cluster: 
+```bash
+az aks stop --name jobportal --resource-group jobportal
+```
+
+Start AKS cluster:
+```bash
+az aks start --name jobportal --resource-group jobportal
+```
+
 # Kubectl cheat sheet
 
 ```bash

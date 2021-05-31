@@ -6,7 +6,7 @@ defmodule Endpoints.ApplicationEndpoint do
     alias Services.Url
      
     @endpoint_url Application.get_env(:portal_management, :endpoint_url)
-    @origin Application.get_env(:portal_management, :origin)
+    @origin Application.get_env(:portal_management, :origin) # TODO Refactor this to use function instead of "constant"
     
     plug CORSPlug, origin: @origin
     plug(:match)
